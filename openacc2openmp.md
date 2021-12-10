@@ -2,6 +2,20 @@
 GPU-programming: Porting OpenACC to OpenMP
 =========================================    
 
+$\sum_{n=1}^{10} n^2$
+
+```math
+$$\frac{\partial^{2} f(x,y)}{\partial^{2} x} + \frac{\partial^{2} f(x,y)}{\partial^{2} y}=0$$
+
+```
+
+$ \sum_{\forall i}{x_i^{2}} $
+
+Some display math:
+```math
+e^{i\pi} + 1 = 0
+```
+and some inline math, $`a^2 + b^2 = c^2`$.
 
 Introduction
 ============
@@ -70,8 +84,8 @@ h<sub>&theta;</sub>(x) = &theta;<sub>o</sub> x + &theta;<sub>1</sub>x
 \end{equation}
 
 The Eq.(x) can be further simplified and takes the final form
-```{eval-rst}
-`Eq.`
+```
+$\Big[ H_0 + H_I(t) - i\frac{\partial}{\partial t}\big]|\psi(t) \rangle=0$
 
 ```
 
