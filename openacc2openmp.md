@@ -62,10 +62,12 @@ suffers from some weaknesses, such as low performance, issues with the diagnosti
 Computational model
 ===================
 We give a brief description of the numerical model used to slove the Laplace equation nabla f=0. For the sake of simplicity, we solve the eqution in a two-dimentional (2D) uniform grid. Here we use the finite-difference method to approximate `nabla f`. The spatial discretisation in the second-order scheme can be written as 
-```{eval-rst}
-`Eq.`
 
-```
+h<sub>&theta;</sub>(x) = &theta;<sub>o</sub> x + &theta;<sub>1</sub>x
+
+\begin{equation}
+\Big[ H_0 + H_I(t) - i\frac{\partial}{\partial t}\big]|\psi(t) \rangle=0,
+\end{equation}
 
 The Eq.(x) can be further simplified and takes the final form
 ```{eval-rst}
