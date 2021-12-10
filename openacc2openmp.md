@@ -1,5 +1,7 @@
-```{index} GPU; Intorduction to OpenMP-Offload with Nvidia-GPU; Intorduction to OpenMP-Offload with Nvidia-GPU; Intorduction to OpenMP-Offload with Nvidia-GPU
-```
+
+GPU-programming: Porting OpenACC to OpenMP
+=========================================    
+
 
 Introduction
 ============
@@ -21,11 +23,11 @@ It does function as a benchmark for future advanced GPU-based programming models
 By the end of this tutorial, the user will be able to: 
 
 *	Recognise the necessity of GPU-programming.
-•	Interpret the compiler feedback messages.
-•	Select and map regions of a code into a target device.
-•	Use appropriate constructs and clauses on either programming model to offload compute regions to the GPU device.
-•	Identify and assess the differences and similarities between OpenACC and OpenMP.
-•	Convert an OpenACC to OpenMP offloading using `clacc` compiler.
+*	Interpret the compiler feedback messages.
+*	Select and map regions of a code into a target device.
+*	Use appropriate constructs and clauses on either programming model to offload compute regions to the GPU device.
+*	Identify and assess the differences and similarities between OpenACC and OpenMP.
+*	Convert an OpenACC to OpenMP offloading using `clacc` compiler.
 
 
 OpenACC & OpenMP
@@ -41,21 +43,37 @@ Interfaces (APIs), which here enable to communicate between two heterogenous sys
  addressed in the following for both models. Furthermore, differences and similarities 
  will be assessed in the aim of converting OpenACC to OpenMP.
 
-Motivation: OpenACC is supported for offloading to NVIDIA device by the NVIDIA and PGI 
-compilers. However, it is not supported on the AMD device by AMD compilers such as Clang. 
-This hardware-dependency has limited the use of the OpenACC model. Although the GCC 
-compiler supports OpenACC offloading to AMD target devices, the compilation process 
-suffers from some weaknesses, such as low performance, issues with the diagnostics 
-(see e.g.). This calls for an alternative that goes beyond the GCC compiler to support 
-OpenACC offloading to AMD GPU-accelerators. On the other hand, OpenMP offloading to AMD 
-device is supported by a set of compilers such as Clang and Cray, which are well-known to
- provide the highest. 
+`Motivation:` NVIDIA-based Programming models are bounded by some barriers related to the GPU-architecture. 
+Specifically, the models do not enable support on different devices such as AMD and Intel accelerators nor by 
+the corresponding compilers, i.e. Clang/Flang and Icx/Ifx. Removing such barriers is one of the bottelneck 
+in GPU-programming, which is the case for instance with OpenACC. The latter is one of 
+the most popular programming model that requires a special focus in terms of support on all avaialble architectures.  
+
+Although the GCC compiler supports the OpenACC offload feature, the compilation process, in general, 
+suffers from some weaknesses, such as low performance, issues with the diagnostics ..etc. 
+(see e.g.). This calls for an alternative that goes beyond the GCC compiler, and which ensures higher performance. On the other hand, the OpenMP offloading is supported on multiple devices by a set of compilers such as Clang and Cray, and Icx/Ifx which are well-known to
+ provide the highest performance with respect to GCC. Therefore, converting OpenACC to OpenMP becomes a necessity to overcome the limitations of the OpenACC model set by the NVIDIA vendor. This has been the subject of a project, in which this documentation is inspired by....
+
+ 
+ [Intel](https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html#Intel)
 
 [Saga](https://documentation.sigma2.no/hpc_machines/saga.html#saga)
 
 Computational model
 ===================
+We give a brief description of the numerical model used to slove the Laplace equation nabla f=0. For the sake of simplicity, we solve the eqution in a two-dimentional (2D) uniform grid. Here we use the finite-difference method to approximate `nabla f`. The spatial discretisation in the second-order scheme can be written as 
+```{eval-rst}
+`Eq.`
 
+```
+
+The Eq.(x) can be further simplified and takes the final form
+```{eval-rst}
+`Eq.`
+
+```
+
+The Eq. (xx) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. In the following we implement the OpenACC model with the use of the `Fortran` language to translate the Jacobi algorithm and perform an experiment. In the second section, we adopt the same scenario but with the OpenMP offloading model in the aim of conducting a comparative experiment.
 
 Experiment on OpenACC offloading
 ================================
@@ -101,61 +119,9 @@ $ module load AOMP/13.0-2-gcccuda-2020a ncurses/6.2-GCCcore-9.3.0
 ```
 
 
-```bash
-$ make serial
-$ srun --ntasks=1 --account=<your project number> --time=00:10:00 --mem-per-cpu=125M ./serial
-```
-
-We found, on [Saga](https://documentation.sigma2.no/hpc_machines/saga.html#saga), that executing 1280x720 pixels image with 10,000 iterations takes 11 seconds. 
-
-
-Let’s build up on this and start applying OpenMP directives to transform our serial code into a parallel code on CPU. As we know, the potential parallelizable region is the code with the nested ‘for’ loop, as shown in the figure. 
-
-```{eval-rst}
-.. literalinclude:: ompoffload/mandelbrot_serial.c
-   :language: c++
-   :lines: 121-135
-   :emphasize-lines: 6-11
-
-```
-
-
-```{eval-rst}
-.. literalinclude:: ompoffload/omptarget.c
-   :language: c++
-   :lines: 2-14
-   :emphasize-lines: 1,5
-
-```
-
 ```{note}
-Thread creation is an expensive operation, thread synchronization is also a point of concern which may deteriorate the overall performance. So, don’t let the compiler do all the optimizations for you; use OpenMp wisely.
+blabla
 ```
-
-
-
-```{eval-rst}
-.. literalinclude:: ompoffload/omptarget.c
-   :language: c++
-   :lines: 17-27
-   :emphasize-lines: 1
-
-```
-
-	
-
-```{eval-rst}
-.. literalinclude:: ompoffload/omptarget.c
-   :language: c++
-   :lines: 79-92
-   :emphasize-lines: 1
-
-```
-
-
-At this point, we conslude that GPUs are optimised for throughput whereas CPUs are optimised for latency. Therefore, in order to benefit from using GPUs, we must give enough tasks to process per unit time on the GPU. In our code example, for instance, we care more about pixels per second than the latency of any particular pixel. 
-
-In order to highlight the benefit of using GPUs, we consider an example, in which the size of our input image is increased. As previously, we rerun the code on the GPU as well as on the CPU.
 
 ```bash
 $ make omp
@@ -178,56 +144,3 @@ Image Size | Iterations |OMP-Directive | CPU time in ms. | GPU time in ms.
 8K	 | 10,000 | `parallel for` |  16722.152 | --
 8k	 | 10,000 | `target teams distribute parallel for collapse schedule` | -- | 881.921
 
-
-Resources
-=========
-
-The complete code is available in the compressed format.
-
-```{eval-rst}
-:download:`mandelbrot_gpu.tar.gz <ompoffload/mandelbrot_gpu.tar.gz>`
-
-```
-
-One can download the given `tarball` file on his/her computer and copy it to `Saga` using `scp` command, as shown below.
-
-```bash
-$ scp <source_directory/mandelbrot_gpu.tar.gz> username@saga.sigma2.no:/cluster/home/<target_directory>
-```
-`source directory` should be the absolute path of the downloaded `tarball` on your computer, and the target direcetory should be the directory where you want to keep and uncompress the `tarball`.
-
-To uncompress the `tarball` file, execute the following command on the terminal.
-
-```bash
-$ tar -zxvf mandelbrot_gpu.tar.gz
-```
-
-
-
-Makefile
-========
-For our sample code, we used `Makefile` to build. `Makefile` contains all the code that is needed to automate the boring task of transforming the source code into an excutable. One could argue; why not `batch` script? The advantage of `make` over the script is that one can specify the relationships between the elements of the program to `make`, and through this relationship together with timestamps it can figure out exactly what steps need to be repeated in order to produce the desired program each time. In short, it saves time by optimizing the build process.
-
-The complete `Makefile` is listed here.
-
-```{eval-rst}
-.. literalinclude:: ompoffload/Makefile.txt
-   :language: c++
-   :lines: 1-15
-
-```
-
-In our `Makefile` we wrote some rules to compile and link our code. Each of the rules defines target. <Few other things, in this section, will be added by Hicham>
-
-
-Compilation process
-===================
-
-We briefly describe the syntax of the compilation process with the Clang compiler to implement the OpenMP offload targeting NVIDIA-GPUs on the [Saga](https://documentation.sigma2.no/hpc_machines/saga.html#saga) platform. The syntax is given below:
-
-clang -fopenmp=libomp -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target=nvptx64-nvidia-cuda -march=sm_60 gpu_code.c
-
-Here the flag -fopenmp activates the OpenMP directives (i.e. #pragma omp). The option -fopenmp-targets is used to enable target offloading to NVIDIA-GPUs and the -Xopenmp-target flag enables options to be passed to the target offloading toolchain. Last, the flag -march specifies the name of the NVIDIA GPU architecture.
-
-
-<todo: spelling check>
