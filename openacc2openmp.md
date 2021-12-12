@@ -44,6 +44,9 @@ Although the GCC compiler supports the OpenACC offload feature, the compilation 
 suffers from some weaknesses, such as low performance, issues with the diagnostics ..etc. 
 (see e.g.). This calls for an alternative that goes beyond the GCC compiler, and which ensures higher performance. On the other hand, the OpenMP offloading is supported on multiple devices by a set of compilers such as *Clang/Flang* and *Cray*, and *Icx/Ifx* which are well-known to
  provide the highest performance with respect to GCC. Therefore, converting OpenACC to OpenMP becomes a necessity to overcome the limitations of the OpenACC model set by the NVIDIA vendor. This has been the subject of a project, in which this documentation is inspired by....
+ 
+ This tutorial is organised as follows. In sec. II, we provide a computational model, which is based on solving the Laplace equation. Section III is devoted to 
+ the analysis of experiments performed using the OpenACC and OpenMP offload features. Section IV is directed to a discussion about converting OpenACC to OpenMP in the Clang/Flang compiler. In Sec. V we provide a short description on the compilation process. Finally, conclusions are given in Sec. VI.
 
 # Computational model
 
