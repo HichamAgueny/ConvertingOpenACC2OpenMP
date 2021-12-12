@@ -5,25 +5,20 @@
 
 This tutorial is designed for beginners in GPU-programming and who want to get familiar 
 with available directives programming models, in particular, OpenACC and OpenMP offloading
-models. The tutorial does not require any basic knowledge in GPU-programming. It aims to
-provide an overview of these programming models, and to guide users towards the optimal
-use of programming models. The tutorial will familiarise the users with the most needed
+models. The tutorial does not require any basic knowledge in GPU-programming. It aims at
+providing an overview of these two models, and at guiding users towards their optimal
+use. This tutorial ultimately aims at initiating user interest in GPU-programming. 
+Specifically, it will familiarise the users with the most needed
 constructs and clauses via a practical tool based on solving numerically the Laplace
-equation…and carrying out experiment on the performance of various constructs and clauses.
-
-This tutorial ultimately aims at initiating user interest in GPU-programming; 
-it is thus considered as a first step towards advanced and efficient parallel 
-programming models. 
-
-It does function as a benchmark for future advanced GPU-based programming models.
+equation, and carrying out experiments on their performance.
 
 By the end of this tutorial, the user will be able to: 
 
 *	Recognise the necessity of GPU-programming.
-*	Interpret the compiler feedback messages.
-*	Select and map regions of a code into a target device.
+*	Recognise the GPU-architecture and its functionality.
 *	Use appropriate constructs and clauses on either programming model to offload compute regions to the GPU device.
-*	Identify and assess the differences and similarities between OpenACC and OpenMP.
+*	Select and map regions of a code into a target device.
+*	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
 *	Convert an OpenACC to OpenMP offloading using `clacc` compiler.
 
 
@@ -68,15 +63,24 @@ The Eq.(x) can be further simplified and takes the final form
 $$\Delta f(x,y)=\frac{\partial^{2} f(x,y)}{\partial^{2} x} + \frac{\partial^{2} f(x,y)}{\partial^{2} y}=0$$
 ```
 
-The Eq. (xx) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid having 4096 points in both `x` and `y` directions. The compute code is written in *Fortran 90* and a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc)
+The Eq. (xx) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid having 4096 points in both `x` and `y` directions. The compute code is written in *Fortran 90* and a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc).
 
 # Comparative study: OpenACC versus OpenMP
 
-In the following we cover both the implementation of the OpenACC model to accelerate the Jacobi algorithm and the OpenMP offloading model in the aim of conducting a comparative experiment. The experiments are systematically performed with a fixed number of grid points as well as the number of iterations.
+In the following we cover both the implementation of the OpenACC model to accelerate the Jacobi algorithm and the OpenMP offloading model in the aim of conducting a comparative experiment. The experiments are systematically performed with a fixed number of grid points as well as the number of iterations that ensures the convergence of the algorithm.
 
 ## Experiment on OpenACC offloading
 
-We begin with our first OpenACC experiment, in which we evaluate the performance of different compute constructs and clauses. We incorporate  
+We begin first by briefly describing the NVIDIA architecture. This is schematically illustrated in Fig. 1. Here one can see that each block 
+
+We begin with our first OpenACC experiment, in which we evaluate the performance of different compute constructs and clauses and interprete their functionality. 
+
+
+In Fig. 2 we show the performance of the three main compute constructs: `!$acc serial`, `!$acc kernels` and `!$acc parallel`. These directives determine a looped compute region to be executed on the GPU-device. More specifically, they tell the compiler to transfer the control of the looped region to the GPU-device and excute the region either in a serial way (i.e. by selecting *acc serial*) or as a sequence of operations (i.e. by choosing *acc kernels* and *acc parallel*). The use of *acc parallel* construct, however, offers some additional functionality. This manifests in the control of the execution on the device via the specification of the `gang`, `worker` and `vector`. Whereas the *acc kernels* construct .....
+
+Under the utilization of these constructs, no parallelism is performed yet. This explains the observed low performance in Fig. 2 in the case of introducing the compute constructs compared to the CPU-serial code. Note that we should not confuse the construct `!$acc serial` with the CPU-serial case.         
+
+Here the compiler makes the optimal choice of the numbers of gang, worker and vector that can be used to performe the parallelization. 
 
 talk about the concept of different constructs and clause....interprete.
 
