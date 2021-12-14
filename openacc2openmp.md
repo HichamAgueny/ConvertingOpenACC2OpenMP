@@ -74,22 +74,38 @@ In the following we cover both the implementation of the OpenACC model to accele
 
 ## Experiment on OpenACC offloading
 
+We begin first by illustarting the functionality of the OpenACC model in terms of parallelism. Here the parallelism in OpenACC is performed by exploiting the well-known three levels of parallelism defined by: **gang**, **worker** and **vector** parallelisms, as schematically represented in Fig. 1. A **gang** consists of a set of workers (or one worker). Each worker 
+
+
+Here the **gang** clause has a role of partitioning the loop across gangs. 
+**worker** clause enables the partition across workers.
+**vector**: vectorize the loop.
+
+different gangs operate independently. 
+
 We begin first by briefly describing the NVIDIA architecture. This is schematically illustrated in Fig. 1. Here one can see that each block 
 
 We begin with our first OpenACC experiment, in which we evaluate the performance of different compute constructs and clauses and interprete their functionality. 
 
+The advantage of explictely specifying these clauses by the programmer is 
 
 In Fig. 2 we show the performance of the three main compute constructs: **serial**, **kernels** and **parallel**. These directives determine a looped compute region to be executed on the GPU-device. More specifically, they tell the compiler to transfer the control of the looped region to the GPU-device and excute the region either in a serial way (i.e. by selecting **serial**) or as a sequence of operations (i.e. by choosing **kernels** and **parallel**). The use of **parallel** construct, however, offers some additional functionality. This manifests by the explicit control of the execution on the device via the specification of the **gang**, **worker** and **vector**. Whereas in the **kernels** construct, the compiler has more on choice of ...
 
 These two constructs differ in terms of mapping the parallelism into the device. Here, when specifying the **kernels** construct, the compiler perofmes the partition of the parallelism explicitly by choosing the optimal numbers of gangs, workers and the length of the vectors. Whereas, the use of the **parallel** construct offers some additional functionality: it allows the programmer to control the execution in the device by specifying the **gang**, **worker** and **vector**.
 
+One can specify the number of **gang**, **worker** and the length of the **vector** clause to parallelise a looped region. Accoriding to the OpenACC [specification](https://www.openacc.org/sites/default/files/inline-files/OpenACC_Programming_Guide_0_0.pdf) the order of these clauses should be enforced: the **gang** clause must determine the outermost loop and the **vector** clause should define the innermost parallel loop, while the **worker** clause should be in between these two clauses.
+
+
+
 Whey using these constructs, the compiler will generate arrays that will be copied back and forth between the host and the device if they are not already present in the device. 
 
-Here the compiler copies the data first to the device in the begining of the loop and then copies it back to the host at the end of the loop. This process repeats itself at each iteration, which makes it time consumming, thus rending the parallelism inefficient. To overcome this issue, one need to copy the data to the device only in the begining of the iteration and copy it back to the host at the end of the iteration, when the result converges. Introducing the data locality concepts shows a vast improvement of the performance: the speed get reduced from 111.2 s to 2.12 s. One can further tun the process by adding additional clauses such colla
+Here the compiler copies the data first to the device in the begining of the loop and then copies it back to the host at the end of the loop. This process repeats itself at each iteration, which makes it time consumming, thus rending the parallelism inefficient. To overcome this issue, one need to copy the data to the device only in the begining of the iteration and copy it back to the host at the end of the iteration, once the result converges. Introducing the data locality concepts shows a vast improvement of the performance: the computing time get reduced by almost a factor of 53: it decreases from 111.2 s to 2.12 s. One can further tun the process by adding additional control. Here one can introduce the **collapse** clause. Collapsing two or more loops into a single loop is beneficial for the compiler, as it allows to enhance the parallelism when mapping the looped region into the device.
+
+data locality...
 
 Once can also introduce explicit control of the parallelism. This can be achieved by incorporating the clauses: `gang`, `worker` and `vector`. 
 
-
+Introduci
 
 
 
