@@ -63,7 +63,7 @@ $$\frac{\partial^{2} f(x,y)}{\partial^{2} x}=$\frac{f(x_{i+1},y) - 2f(x_{i},y) +
 
 The Eq.(x) can be further simplified and takes the final form
 ```math
-$$\Delta f(x,y)=\frac{\partial^{2} f(x,y)}{\partial^{2} x} + \frac{\partial^{2} f(x,y)}{\partial^{2} y}=0$$
+$$f(x,y)=\frac{f(x_{i+1},y) + f(x_{i-1},y) + f(x,y_{i+1}) + f(x,y_{i-1})}{4}$$
 ```
 
 The Eq. (xx) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid having 4096 points in both `x` and `y` directions. The compute code is written in *Fortran 90* and a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc).
