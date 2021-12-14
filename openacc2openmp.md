@@ -63,10 +63,10 @@ $$\frac{\partial^{2} f(x,y)}{\partial^{2} x}=$\frac{f(x_{i+1},y) - 2f(x_{i},y) +
 
 The Eq.(x) can be further simplified and takes the final form
 ```math
-$$f(x,y)=\frac{f(x_{i+1},y) + f(x_{i-1},y) + f(x,y_{i+1}) + f(x,y_{i-1})}{4}$$
+$$f(x_i,y_j)=\frac{f(x_{i+1},y) + f(x_{i-1},y) + f(x,y_{i+1}) + f(x,y_{i-1})}{4}$$
 ```
 
-The Eq. (xx) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid having 4096 points in both `x` and `y` directions. The compute code is written in *Fortran 90* and a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc).
+The Eq. (xx) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid having 8192 points in both `x` and `y` directions. The compute code is written in *Fortran 90* and a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc).
 
 # Comparative study: OpenACC versus OpenMP
 
@@ -79,7 +79,19 @@ We begin first by briefly describing the NVIDIA architecture. This is schematica
 We begin with our first OpenACC experiment, in which we evaluate the performance of different compute constructs and clauses and interprete their functionality. 
 
 
-In Fig. 2 we show the performance of the three main compute constructs: **serial**, **kernels** and **parallel**. These directives determine a looped compute region to be executed on the GPU-device. More specifically, they tell the compiler to transfer the control of the looped region to the GPU-device and excute the region either in a serial way (i.e. by selecting **serial**) or as a sequence of operations (i.e. by choosing **kernels** and **parallel**). The use of **parallel** construct, however, offers some additional functionality. This manifests in the control of the execution on the device via the specification of the **gang**, **worker** and **vector**. Whereas the **kernels** construct .....
+In Fig. 2 we show the performance of the three main compute constructs: **serial**, **kernels** and **parallel**. These directives determine a looped compute region to be executed on the GPU-device. More specifically, they tell the compiler to transfer the control of the looped region to the GPU-device and excute the region either in a serial way (i.e. by selecting **serial**) or as a sequence of operations (i.e. by choosing **kernels** and **parallel**). The use of **parallel** construct, however, offers some additional functionality. This manifests by the explicit control of the execution on the device via the specification of the **gang**, **worker** and **vector**. Whereas in the **kernels** construct, the compiler has more on choice of ...
+
+These two constructs differ in terms of mapping the parallelism into the device. Here, when specifying the **kernels** construct, the compiler perofmes the partition of the parallelism explicitly by choosing the optimal numbers of gangs, workers and the length of the vectors. Whereas, the use of the **parallel** construct offers some additional functionality: it allows the programmer to control the execution in the device by specifying the **gang**, **worker** and **vector**.
+
+Whey using these constructs, the compiler will generate arrays that will be copied back and forth between the host and the device if they are not already present in the device. 
+
+Here the compiler copies the data first to the device in the begining of the loop and then copies it back to the host at the end of the loop. This process repeats itself at each iteration, which makes it time consumming, thus rending the parallelism inefficient. To overcome this issue, one need to copy the data to the device only in the begining of the iteration and copy it back to the host at the end of the iteration, when the result converges. Introducing the data locality concepts shows a vast improvement of the performance: the speed get reduced from 111.2 s to 2.12 s. One can further tun the process by adding additional clauses such colla
+
+Once can also introduce explicit control of the parallelism. This can be achieved by incorporating the clauses: `gang`, `worker` and `vector`. 
+
+
+
+
 
 Under the utilization of these constructs, no parallelism is performed yet. This explains the observed low performance in Fig. 2 in the case of introducing the compute constructs compared to the CPU-serial code. Note that we should not confuse the construct **serial** with the CPU-serial case.         
 
