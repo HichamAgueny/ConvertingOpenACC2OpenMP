@@ -74,13 +74,24 @@ In the following we cover both the implementation of the OpenACC model to accele
 
 ## Experiment on OpenACC offloading
 
-We begin first by illustarting the functionality of the OpenACC model in terms of parallelism. The concept of parallelism is defined by: **gang**, **worker** and **vector** parallelisms, as schematically represented in Fig. 1. The directive **gang** consists of a set of workers (or one worker) (block of threads). A block of loop is assigned to each gang...this gets vectorized by means of **vectro** to be run on the processing elements. 
+We begin first by illustarting the functionality of the OpenACC model in terms of parallelism, which is implemented via the directives **kernels** or **parallel loop**. The concept of parallelism functions via the generic directives: **gang**, **worker** and **vector** as schematically represented in Fig. 1 (left-hand side). Here, the compiler initiates the parallelism by generating parallel gangs, in which each gang consists of a set of workers represented by a matrix of threads. This group of threads within a gang execute the same instruction (SIMT, Single Instruction Multiple Threads) via the vectorization process. In this scenario, a block of loops is assigned to each gang, which gets vectorized and executed redundantly by a group of threads.  
+
+In the hardware picture, a GPU-device consists of a block of Compute Units (CUs) each of which is organized as a matrix of Processing Elements (PEs), as shown in Fig. 1 (right-hand side). As an example, the NVIDIA-GPU V100 has 84 CUs and each CU has 64 PEs with a total of 5396 PEs. 
+
+
+the directive **vectro** to be run on the processing elements. 
+
+the execution is mapped on 
 
 Each compute unit is associated to one gang of threads...in which a block of loop is assigned to.
 
-Here the **gang** clause has a role of partitioning the loop across gangs. 
-**worker** clause enables the partition across workers.
-**vector**: vectorize the loop.
+In short, the role of these directives for processing the parallelism is summarized [here](https://www.openacc.org/sites/default/files/inline-files/OpenACC_Programming_Guide_0_0.pdf): 
+
+*The **gang** clause has a role of partitioning the loop across gangs. 
+*The **worker** clause enables the partition across workers.
+*The **vector** clause enables the vectorization of the loop.
+
+the vector length indicates how many data elements can be operated on
 
 different gangs operate independently. 
 
