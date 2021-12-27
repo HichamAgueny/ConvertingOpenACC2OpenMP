@@ -74,8 +74,9 @@ In the following we cover both the implementation of the OpenACC model to accele
 
 ## Experiment on OpenACC offloading
 
-We begin first by illustarting the functionality of the OpenACC model in terms of parallelism. Here the parallelism in OpenACC is performed by exploiting the well-known three levels of parallelism defined by: **gang**, **worker** and **vector** parallelisms, as schematically represented in Fig. 1. A **gang** consists of a set of workers (or one worker). Each worker 
+We begin first by illustarting the functionality of the OpenACC model in terms of parallelism. The concept of parallelism is defined by: **gang**, **worker** and **vector** parallelisms, as schematically represented in Fig. 1. The directive **gang** consists of a set of workers (or one worker) (block of threads). A block of loop is assigned to each gang...this gets vectorized by means of **vectro** to be run on the processing elements. 
 
+Each compute unit is associated to one gang of threads...in which a block of loop is assigned to.
 
 Here the **gang** clause has a role of partitioning the loop across gangs. 
 **worker** clause enables the partition across workers.
@@ -99,7 +100,7 @@ One can specify the number of **gang**, **worker** and the length of the **vecto
 
 Whey using these constructs, the compiler will generate arrays that will be copied back and forth between the host and the device if they are not already present in the device. 
 
-Here the compiler copies the data first to the device in the begining of the loop and then copies it back to the host at the end of the loop. This process repeats itself at each iteration, which makes it time consumming, thus rending the parallelism inefficient. To overcome this issue, one need to copy the data to the device only in the begining of the iteration and copy it back to the host at the end of the iteration, once the result converges. Introducing the data locality concepts shows a vast improvement of the performance: the computing time get reduced by almost a factor of 53: it decreases from 111.2 s to 2.12 s. One can further tun the process by adding additional control. Here one can introduce the **collapse** clause. Collapsing two or more loops into a single loop is beneficial for the compiler, as it allows to enhance the parallelism when mapping the looped region into the device.
+Here the compiler copies the data first to the device in the begining of the loop and then copies it back to the host at the end of the loop. This process repeats itself at each iteration, which makes it time consumming, thus rending the GPU-acceleration inefficient. To overcome this issue, one need to copy the data to the device only in the begining of the iteration and copy it back to the host at the end of the iteration, once the result converges. Introducing the data locality concepts shows a vast improvement of the performance: the computing time get reduced by almost a factor of 53: it decreases from 111.2 s to 2.12 s. One can further tun the process by adding additional control. Here one can introduce the **collapse** clause. Collapsing two or more loops into a single loop is beneficial for the compiler, as it allows to enhance the parallelism when mapping the looped region into the device.
 
 data locality...
 
