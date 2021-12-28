@@ -76,20 +76,13 @@ In the following we cover both the implementation of the OpenACC model to accele
 
 We begin first by illustarting the functionality of the OpenACC model in terms of parallelism, which is implemented via the directives **kernels** or **parallel loop**. The concept of parallelism functions via the generic directives: **gang**, **worker** and **vector** as schematically represented in Fig. 1 (left-hand side). Here, the compiler initiates the parallelism by generating parallel gangs, in which each gang consists of a set of workers represented by a matrix of threads. This group of threads within a gang execute the same instruction (SIMT, Single Instruction Multiple Threads) via the vectorization process. In this scenario, a block of loops is assigned to each gang, which gets vectorized and executed redundantly by a group of threads.  
 
-In the hardware picture, a GPU-device consists of a block of Compute Units (CUs) each of which is organized as a matrix of Processing Elements (PEs), as shown in Fig. 1 (right-hand side). As an example, the NVIDIA-GPU V100 has 84 CUs and each CU has 64 PEs with a total of 5396 PEs. 
+In the hardware picture, a GPU-device consists of a block of Compute Units (CUs) (CU is a general term for a Streaming Multiprocessor, SM) each of which is organized as a matrix of Processing Elements (PEs) (PE is a general term for a CUDA core), as shown in Fig. 1 (right-hand side). As an example, the [NVIDIA P100 GPU-accelerators](https://images.nvidia.com/content/tesla/pdf/nvidia-tesla-p100-PCIe-datasheet.pdf) [see also [here](http://web.engr.oregonstate.edu/~mjb/cs575/Handouts/gpu101.2pp.pdf)] have 56 CUs (or 56 SMs) and each CU has 64 PEs (or 64 CUDA cores) with a total of 3584 PEs (i.e. 3584 FP32 cores/GPU or 1792 FP64 cores/GPU), while the [NVIDIA V100](https://images.nvidia.com/content/technologies/volta/pdf/volta-v100-datasheet-update-us-1165301-r5.pdf) has 80 CUs and each CU has 64 PEs with a total of 5120 PEs (5120 FP32/GPU or 2560 FP64/GPU), where FP32 and FP64 correspond to the single-precision Floating Point (FP) (i.e. 32 bit) and double precision (64 bit), respectively. 
 
+The execution of the parallelism is mapped on the GPU-device in the following: each compute unit is associated to one gang of threads generated via the directive **gang**, in which a block of loops is assigned to. In addition, each block of loops is run on the processing element via the directive **vector**. In short, the role of these directives for processing the parallelism is summarized [here](https://www.openacc.org/sites/default/files/inline-files/OpenACC_Programming_Guide_0_0.pdf): 
 
-the directive **vectro** to be run on the processing elements. 
-
-the execution is mapped on 
-
-Each compute unit is associated to one gang of threads...in which a block of loop is assigned to.
-
-In short, the role of these directives for processing the parallelism is summarized [here](https://www.openacc.org/sites/default/files/inline-files/OpenACC_Programming_Guide_0_0.pdf): 
-
-*The **gang** clause has a role of partitioning the loop across gangs. 
-*The **worker** clause enables the partition across workers.
-*The **vector** clause enables the vectorization of the loop.
+*The **gang** clause has a role of partitioning the loop across gangs, and each gang has num_gang. 
+*The **worker** clause enables the partition across workers, and each worker has num_worker.
+*The **vector** clause enables the vectorization of the loop, and ....
 
 the vector length indicates how many data elements can be operated on
 
@@ -136,7 +129,7 @@ Fig.1: speed up vs constructs, clauses.
 For completness, we provide 
 
 
-### Compiling and running OpenMP-program
+### Compiling and running OpenACC-program
 
 We run our OpenACC-program on the `NVIDIA-GPU P100`. Compiling the code requires first loading the NVHPC module. This can be done in the [saga](https://documentation.sigma2.no/hpc_machines/saga.html) platform via
 ```bash
