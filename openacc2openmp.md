@@ -80,9 +80,9 @@ In the hardware picture, a GPU-device consists of a block of Compute Units (CUs)
 
 The execution of the parallelism is mapped on the GPU-device in the following: each compute unit is associated to one gang of threads generated via the directive **gang**, in which a block of loops is assigned to. In addition, each block of loops is run on the processing element via the directive **vector**. In short, the role of these directives for processing the parallelism is summarized [here](https://www.openacc.org/sites/default/files/inline-files/OpenACC_Programming_Guide_0_0.pdf): 
 
-*The **gang** clause has a role of partitioning the loop across gangs, and each gang has num_gang. 
-*The **worker** clause enables the partition across workers, and each worker has num_worker.
-*The **vector** clause enables the vectorization of the loop, and ....
+- The **gang** clause has a role of partitioning the loop across gangs, and each gang has num_gang. 
+- The **worker** clause enables the partition across workers, and each worker has num_worker.
+- The **vector** clause enables the vectorization of the loop, and ....
 
 the vector length indicates how many data elements can be operated on
 
