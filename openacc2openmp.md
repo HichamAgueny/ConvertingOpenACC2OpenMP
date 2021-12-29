@@ -74,6 +74,8 @@ In the following we cover both the implementation of the OpenACC model to accele
 
 ## Experiment on OpenACC offloading
 
+We begin first by briefly describing the NVIDIA architecture. This is schematically illustrated in Fig. 1. Here one can see that each block 
+
 We begin first by illustarting the functionality of the OpenACC model in terms of parallelism, which is implemented via the directives **kernels** or **parallel loop**. The concept of parallelism functions via the generic directives: **gang**, **worker** and **vector** as schematically represented in Fig. 1 (left-hand side). Here, the compiler initiates the parallelism by generating parallel gangs, in which each gang consists of a set of workers represented by a matrix of threads. This group of threads within a gang execute the same instruction (SIMT, Single Instruction Multiple Threads) via the vectorization process. In this scenario, a block of loops is assigned to each gang, which gets vectorized and executed redundantly by a group of threads.  
 
 In the hardware picture, a GPU-device consists of a block of Compute Units (CUs) (CU is a general term for a Streaming Multiprocessor, SM) each of which is organized as a matrix of Processing Elements (PEs) (PE is a general term for a CUDA core), as shown in Fig. 1 (right-hand side). As an example, the [NVIDIA P100 GPU-accelerators](https://images.nvidia.com/content/tesla/pdf/nvidia-tesla-p100-PCIe-datasheet.pdf) [see also [here](http://web.engr.oregonstate.edu/~mjb/cs575/Handouts/gpu101.2pp.pdf)] have 56 CUs (or 56 SMs) and each CU has 64 PEs (or 64 CUDA cores) with a total of 3584 PEs (i.e. 3584 FP32 cores/GPU or 1792 FP64 cores/GPU), while the [NVIDIA V100](https://images.nvidia.com/content/technologies/volta/pdf/volta-v100-datasheet-update-us-1165301-r5.pdf) has 80 CUs and each CU has 64 PEs with a total of 5120 PEs (5120 FP32/GPU or 2560 FP64/GPU), where FP32 and FP64 correspond to the single-precision Floating Point (FP) (i.e. 32 bit) and double precision (64 bit), respectively. 
@@ -88,23 +90,32 @@ the vector length indicates how many data elements can be operated on
 
 different gangs operate independently. 
 
-We begin first by briefly describing the NVIDIA architecture. This is schematically illustrated in Fig. 1. Here one can see that each block 
 
-We begin with our first OpenACC experiment, in which we evaluate the performance of different compute constructs and clauses and interprete their functionality. 
 
-The advantage of explictely specifying these clauses by the programmer is 
+We move now to discuss our OpenACC experiment, in which we evaluate the performance of different compute constructs and clauses and interprete their role. The GPU-based code is shown below. 
 
-In Fig. 2 we show the performance of the three main compute constructs: **serial**, **kernels** and **parallel**. These directives determine a looped compute region to be executed on the GPU-device. More specifically, they tell the compiler to transfer the control of the looped region to the GPU-device and excute the region either in a serial way (i.e. by selecting **serial**) or as a sequence of operations (i.e. by choosing **kernels** and **parallel**). The use of **parallel** construct, however, offers some additional functionality. This manifests by the explicit control of the execution on the device via the specification of the **gang**, **worker** and **vector**. Whereas in the **kernels** construct, the compiler has more on choice of ...
+```bash
+fortran code: OpenACC
+```
 
-These two constructs differ in terms of mapping the parallelism into the device. Here, when specifying the **kernels** construct, the compiler perofmes the partition of the parallelism explicitly by choosing the optimal numbers of gangs, workers and the length of the vectors. Whereas, the use of the **parallel** construct offers some additional functionality: it allows the programmer to control the execution in the device by specifying the **gang**, **worker** and **vector**.
+
+
+In Fig. 2 we show the performance of the three main compute constructs: **kernels** and **parallel**. These directives determine a looped compute region to be executed on the GPU-device. More specifically, they tell the compiler to transfer the control of the looped region to the GPU-device and excute the region in a sequence of operations. These two constructs differ in terms of mapping the parallelism into the device. Here, when specifying the **kernels** construct, the compiler perofmes the partition of the parallelism explicitly by choosing the optimal numbers of gangs, workers and the length of the vectors. Whereas, the use of the **parallel** construct offers some additional functionality: it allows the programmer to control the execution in the device by specifying the **gang**, **worker** and **vector**. This specification is optional, and thus it does not affect the functionality of the OpenACC code, except if the number associated to these clauses is specified. 
+
+Here the compiler makes the optimal choice of the numbers of gang, worker and vector that can be used to performe the parallelization. 
 
 One can specify the number of **gang**, **worker** and the length of the **vector** clause to parallelise a looped region. Accoriding to the OpenACC [specification](https://www.openacc.org/sites/default/files/inline-files/OpenACC_Programming_Guide_0_0.pdf) the order of these clauses should be enforced: the **gang** clause must determine the outermost loop and the **vector** clause should define the innermost parallel loop, while the **worker** clause should be in between these two clauses.
 
+Under the utilization of these constructs, no parallelism is performed yet. This explains the low performance observed in Fig. 2 compared to the CPU-serial code.       
+
+When using these constructs, the compiler will generate arrays that will be copied back and forth between the host and the device if they are not already present in the device. 
+
+To be specific, the construct **parallel** indicates that the compiler will generate a number of parallel gangs to execute the looped region redundantly.
+The clause **loop** tells the compiler to perform the parallelism for the specified looped region. These two directives can be combined in one directive.
 
 
-Whey using these constructs, the compiler will generate arrays that will be copied back and forth between the host and the device if they are not already present in the device. 
 
-Here the compiler copies the data first to the device in the begining of the loop and then copies it back to the host at the end of the loop. This process repeats itself at each iteration, which makes it time consumming, thus rending the GPU-acceleration inefficient. To overcome this issue, one need to copy the data to the device only in the begining of the iteration and copy it back to the host at the end of the iteration, once the result converges. Introducing the data locality concepts shows a vast improvement of the performance: the computing time get reduced by almost a factor of 53: it decreases from 111.2 s to 2.12 s. One can further tun the process by adding additional control. Here one can introduce the **collapse** clause. Collapsing two or more loops into a single loop is beneficial for the compiler, as it allows to enhance the parallelism when mapping the looped region into the device.
+In the scenario shown in Fig. 3 (left-hand side), only the directive **parallel loop** is introduced. Here the construct **parallel** indicates that the compiler will generate a number of parallel gangs to execute the looped region redundantly. When it is combined with the clause **loop**, the compiler will perform the parallelism over all the generated gangs for the specified looped region. In this case the compiler copies the data first to the device in the begining of the loop and then copies it back to the host at the end of the loop. This process repeats itself at each iteration, which makes it time consumming, thus rending the GPU-acceleration inefficient. To overcome this issue, one need to copy the data to the device only in the begining of the iteration and copy it back to the host at the end of the iteration, once the result converges. This can be done by introducing the data locality concepts via the directives **data**, **copyin** and **copyout**, as shown in Fig3 (right-hand side). Here, the clause **copyin** transfers the data to the GPU-device, while the clause **copyout** copies the data back to the host. Implementing this approach shows a vast improvement of the performance: the computing time get reduced by almost a factor of 53: it decreases from 111.2 s to 2.12 s. One can further tun the process by adding additional control, for instance, by introducing the **collapse** clause. Collapsing two or more loops into a single loop is beneficial for the compiler, as it allows to enhance the parallelism when mapping the looped region into the device. In addition, one can specify the clause **reduction**, which allows the compiler to compute the maximum in a parallel way. These additional clauses affect slightly the computing time: it goes from 2.12 s to 1.95 s.
 
 data locality...
 
@@ -113,10 +124,6 @@ Once can also introduce explicit control of the parallelism. This can be achieve
 Introduci
 
 
-
-Under the utilization of these constructs, no parallelism is performed yet. This explains the observed low performance in Fig. 2 in the case of introducing the compute constructs compared to the CPU-serial code. Note that we should not confuse the construct **serial** with the CPU-serial case.         
-
-Here the compiler makes the optimal choice of the numbers of gang, worker and vector that can be used to performe the parallelization. 
 
 talk about the concept of different constructs and clause....interprete.
 
