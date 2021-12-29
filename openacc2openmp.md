@@ -130,7 +130,7 @@ Once can also introduce explicit control of the parallelism. This can be achieve
 
 Introduci
 
-
+Fig. 2 serial, kernels, parallel loop, vs full implementation 
 
 talk about the concept of different constructs and clause....interprete.
 
