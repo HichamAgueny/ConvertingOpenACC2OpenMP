@@ -86,6 +86,9 @@ The execution of the parallelism is mapped on the GPU-device in the following: e
 - The **worker** clause enables the partition across workers, and each worker has num_worker.
 - The **vector** clause enables the vectorization of the loop, and ....
 
+num_gangs: Controls how many parallel gangs are created.
+num_workers: Controls how many workers are created in each gang.
+vector_length: Controls the vector length on each worker.
 the vector length indicates how many data elements can be operated on
 
 different gangs operate independently. 
@@ -95,7 +98,7 @@ different gangs operate independently.
 We move now to discuss our OpenACC experiment, in which we evaluate the performance of different compute constructs and clauses and interprete their role. The GPU-based code is shown below. 
 
 ```bash
-fortran code: OpenACC
+serial fortran code
 ```
 
 
@@ -116,6 +119,10 @@ The clause **loop** tells the compiler to perform the parallelism for the specif
 
 
 In the scenario shown in Fig. 3 (left-hand side), only the directive **parallel loop** is introduced. Here the construct **parallel** indicates that the compiler will generate a number of parallel gangs to execute the looped region redundantly. When it is combined with the clause **loop**, the compiler will perform the parallelism over all the generated gangs for the specified looped region. In this case the compiler copies the data first to the device in the begining of the loop and then copies it back to the host at the end of the loop. This process repeats itself at each iteration, which makes it time consumming, thus rending the GPU-acceleration inefficient. To overcome this issue, one need to copy the data to the device only in the begining of the iteration and copy it back to the host at the end of the iteration, once the result converges. This can be done by introducing the data locality concepts via the directives **data**, **copyin** and **copyout**, as shown in Fig3 (right-hand side). Here, the clause **copyin** transfers the data to the GPU-device, while the clause **copyout** copies the data back to the host. Implementing this approach shows a vast improvement of the performance: the computing time get reduced by almost a factor of 53: it decreases from 111.2 s to 2.12 s. One can further tun the process by adding additional control, for instance, by introducing the **collapse** clause. Collapsing two or more loops into a single loop is beneficial for the compiler, as it allows to enhance the parallelism when mapping the looped region into the device. In addition, one can specify the clause **reduction**, which allows the compiler to compute the maximum in a parallel way. These additional clauses affect slightly the computing time: it goes from 2.12 s to 1.95 s.
+
+
+reduction(operator: list)
+A private copy of each variable, array, or subarray in list is allocated for each gang. The values for all gangs are combined with the operator at the end of the parallel region. Array reductions are performed individually for each element. Composite variable reductions are performed individually for each member.
 
 data locality...
 
