@@ -66,15 +66,36 @@ The Eq.(x) can be further simplified and takes the final form
 $$f(x_i,y_j)=\frac{f(x_{i+1},y) + f(x_{i-1},y) + f(x,y_{i+1}) + f(x,y_{i-1})}{4}$$
 ```
 
-The Eq. (xx) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid having 8192 points in both `x` and `y` directions. The compute code is written in *Fortran 90* and a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc).
+The Eq. (xx) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid having 8192 points in both `x` and `y` directions. The compute code is written in *Fortran 90* and a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc). The serial code can be written as
+
+```bash
+       do while (max_err.gt.error.and.iter.le.max_iter)
+         do j=2,ny-1
+            do i=2,nx-1
+               d2fx = f(i+1,j) + f(i-1,j)
+               d2fy = f(i,j+1) + f(i,j-1)
+               f_k(i,j) = 0.25*(d2fx + d2fy)
+             enddo
+          enddo
+
+          max_err=0.
+
+          do j=2,ny-1
+            do i=2,nx-1
+               max_err = max(dabs(f_k(i,j) - f(i,j)),max_err)
+               f(i,j) = f_k(i,j)
+            enddo
+          enddo
+
+          iter = iter +1
+        enddo
+```
 
 # Comparative study: OpenACC versus OpenMP
 
 In the following we cover both the implementation of the OpenACC model to accelerate the Jacobi algorithm and the OpenMP offloading model in the aim of conducting a comparative experiment. The experiments are systematically performed with a fixed number of grid points as well as the number of iterations that ensures the convergence of the algorithm.
 
 ## Experiment on OpenACC offloading
-
-We begin first by briefly describing the NVIDIA architecture. This is schematically illustrated in Fig. 1. Here one can see that each block 
 
 We begin first by illustarting the functionality of the OpenACC model in terms of parallelism, which is implemented via the directives **kernels** or **parallel loop**. The concept of parallelism functions via the generic directives: **gang**, **worker** and **vector** as schematically represented in Fig. 1 (left-hand side). Here, the compiler initiates the parallelism by generating parallel gangs, in which each gang consists of a set of workers represented by a matrix of threads. This group of threads within a gang execute the same instruction (SIMT, Single Instruction Multiple Threads) via the vectorization process. In this scenario, a block of loops is assigned to each gang, which gets vectorized and executed redundantly by a group of threads.  
 
@@ -96,11 +117,6 @@ different gangs operate independently.
 
 
 We move now to discuss our OpenACC experiment, in which we evaluate the performance of different compute constructs and clauses and interprete their role. The GPU-based code is shown below. 
-
-```bash
-serial fortran code
-```
-
 
 
 In Fig. 2 we show the performance of the three main compute constructs: **kernels** and **parallel**. These directives determine a looped compute region to be executed on the GPU-device. More specifically, they tell the compiler to transfer the control of the looped region to the GPU-device and excute the region in a sequence of operations. These two constructs differ in terms of mapping the parallelism into the device. Here, when specifying the **kernels** construct, the compiler perofmes the partition of the parallelism explicitly by choosing the optimal numbers of gangs, workers and the length of the vectors. Whereas, the use of the **parallel** construct offers some additional functionality: it allows the programmer to control the execution in the device by specifying the **gang**, **worker** and **vector**. This specification is optional, and thus it does not affect the functionality of the OpenACC code, except if the number associated to these clauses is specified. 
@@ -125,7 +141,6 @@ Once can also introduce explicit control of the parallelism. This can be achieve
 
 Fig. 2 serial, kernels, parallel loop, vs full implementation 
 
-summarize them in a table.
 
 Fig.1: speed up vs constructs, clauses.  
 
@@ -169,16 +184,51 @@ In the script above, the option `partition--accell` enables the access to the GP
 
 ## Experiment on OpenMP offloading
 
+In this section, we carry out an experiment on OpenMP offloading by adopting the same scenario as in the previous section but with the use of a different GPU-architecture. The implementation is done on the AMD Mi100 accelerator. 
 
+As in the previous section, we begin by briefly describing the AMD architecture. This is schematically illustrated in Fig. 1. Here one can see that each block 
+
+..... 
 
 ### Compiling and running OpenMP-program
 
 
 ## Comparative study: OpenACC versus OpenMP
 
+OpenACC | OpenMP | Role 
+-- | -- | 
+acc parallel | omp target | to execute a compute region on a device
+acc data     | omp target data |                   
+acc parallel loop gang worker vector | omp target teams distribute parallel do (for) |
+-- | -- | 
+OpenMP: omp target
+
+Clauses
+OpenACC: acc gang, acc workers, acc vector                     
+
+OpenMP: omp teams, ,omp simd
+
+Workshare for acceleration
+acc loop | omp teams distribute |
+acc loop gang | omp teams |
+acc loop worker | omp parallel simd |
+acc loop vector | omp parallel simd |
+-- | --  |
+To map variables to a device
+acc create() | omp map(alloc:)
+acc copy()   | omp  map(tofrom:)
+acc copyin() | omp map(to:)
+acc copyout()| omp map(from:)
+
+acc reduction(:)| omp reduction(:)
+acc collapse()  | omp collapse()
+No counterpart              | omp schedule(,)
+
+![image](https://user-images.githubusercontent.com/95568317/148049834-f648b934-dc33-49a0-b7ff-089783e8c3ee.png)
 
 # Discussion on porting OpenACC to OpenMP
 
+Converting OpenACC codes to OpenMP is straightforward.
 
 # Conclusion
 
