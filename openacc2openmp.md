@@ -195,28 +195,11 @@ As in the previous section, we begin by briefly describing the AMD architecture.
 
 ## Comparative study: OpenACC versus OpenMP
 
-OpenACC | OpenMP | Role |
--- | -- | -- |
-acc parallel | omp target | to execute a compute region on a device|
-acc parallel loop gang worker vector | omp target teams distribute parallel do (for) | to parallelize a block of loops on a device|
-acc data     | omp target data | to share data between multiple parallel regions in a device|
--- | -- | -- |
-acc loop | omp teams distribute | to workshare for parallelism on a device|
-acc loop gang | omp teams | to partition a loop accross gangs/teams|
-acc loop worker | omp parallel simd | - - |
-acc loop vector | omp parallel simd | - - |
--- | --  | -- |
-acc create() | omp map(alloc:) | to allocate a memory for an array in a device|
-acc copy()   | omp map(tofrom:) | to copy arrays from the host to a device and back to the host|
-acc copyin() | omp map(to:) | to copy arrays to a device|
-acc copyout()| omp map(from:) | to copy arrays from a device to the host|
--- | --  | -- |
-acc reduction(operator:var)| omp reduction(operator:var) | to reduce the number of elements in an array to one value |
-acc collapse(N)  | omp collapse(N)   | to collapse N nested loops into one loop |
-No counterpart  | omp schedule(,)  | to schedule the work for each thread according to the collapsed loops|
+In the following we present a direct comparison between the OpenACC and OpenMP offload features. This comparison is shown below and further illustrated in the table, in which we emphsize the meaning of each construct and clause. This direct comparision indicates that converting OpenACC to OpenMP offloading is straightforward. We thus discuss this conversion procedure in the next section.
+
 
 ```bash
-            **OpenACC**                                |           **OpenMP**
+                    **OpenACC**                        |                    **OpenMP**
 !$acc data copyin(f) copyout(f_k)                      |  !$omp target data map(to:f) map(from:f_k)
    do while (max_err.gt.error.and.iter.le.max_iter)    |     do while (max_err.gt.error.and.iter.le.max_iter)
 !$acc parallel loop gang worker vector collapse(2)     |  !$omp target teams distribute parallel do collapse(2) 
@@ -247,51 +230,39 @@ No counterpart  | omp schedule(,)  | to schedule the work for each thread accord
 !$acc end data                                         |  !$omp end target data
 ```
 
+OpenACC | OpenMP | Role |
+-- | -- | -- |
+acc parallel | omp target | to execute a compute region on a device|
+acc parallel loop gang worker vector | omp target teams distribute parallel do (for) | to parallelize a block of loops on a device|
+acc data     | omp target data | to share data between multiple parallel regions in a device|
+-- | -- | -- |
+acc loop | omp teams distribute | to workshare for parallelism on a device|
+acc loop gang | omp teams | to partition a loop accross gangs/teams|
+acc loop worker | omp parallel simd | - - |
+acc loop vector | omp parallel simd | - - |
+-- | --  | -- |
+acc create() | omp map(alloc:) | to allocate a memory for an array in a device|
+acc copy()   | omp map(tofrom:) | to copy arrays from the host to a device and back to the host|
+acc copyin() | omp map(to:) | to copy arrays to a device|
+acc copyout()| omp map(from:) | to copy arrays from a device to the host|
+-- | --  | -- |
+acc reduction(operator:var)| omp reduction(operator:var) | to reduce the number of elements in an array to one value |
+acc collapse(N)  | omp collapse(N)   | to collapse N nested loops into one loop |
+No counterpart  | omp schedule(,)  | to schedule the work for each thread according to the collapsed loops|
+
 
 # Discussion on porting OpenACC to OpenMP
 
-Converting OpenACC codes to OpenMP is straightforward.
+This dicussion is inspired by the work .
+
+Intel 
 
 # Conclusion
 
 
-Writing an efficient GPU-based program requires some basic knowledge of target architectures and how regions of a program is mapped into the target device. It thus functions as a benchmark for future advanced GPU-based parallel programming models. 
+In conclusion, we have presented in the aim of converting OpenACC to OpenMP offloading. Writing an efficient GPU-based program requires some basic knowledge of target architectures and how regions of a program is mapped into the target device. This tutorial thus functions as a benchmark for future advanced GPU-based parallel programming models. 
 
 
-```bash
-$ module load AOMP/13.0-2-gcccuda-2020a ncurses/6.2-GCCcore-9.3.0
-```
-
-
-```{eval-rst}
-:download:`mandelbrot_serial.c <ompoffload/mandelbrot_serial.c>`
-
-```
-
-```{eval-rst}
-.. literalinclude:: ompoffload/mandelbrot_serial.c
-   :language: c++
-
-```
-
-
-```{eval-rst}
-.. literalinclude:: ompoffload/mandelbrot_serial.c
-   :language: c++
-   :lines: 121-135
-   :emphasize-lines: 8-9
-
-```
-
-
-```{note}
-blabla
-```
-
-```bash
-$ make omp
-$ srun --account=<your project number> --time=10:00 --mem-per-cpu=1G ./omp 8k 10000
-``` 
 
 
 
