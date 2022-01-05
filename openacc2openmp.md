@@ -19,13 +19,12 @@ By the end of this tutorial, the user will be able to:
 *	Use appropriate constructs and clauses on either programming model to offload compute regions to the GPU device.
 *	Select and map regions of a code into a target device.
 *	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
-*	Convert an OpenACC to OpenMP offloading using `clacc` compiler.
+*	Convert an OpenACC to OpenMP offloading using `clacc` compiler platform.
 
 
 # Introduction
 
-Heterogenous computing…
-OpenACC & OpenMP are directive-based programming models for offloading compute regions 
+OpenACC and OpenMP are the most popular programming models for heterogeneous computing. OpenACC was developed a decade ago and was designed for parallel programming of heterogenous CPU & GPU systems. Whereas OpenMP is historically known to be directed to shared-memory multi-core programming, and only recently has provided support for heterogenous systems. OpenACC and OpenMP are directive-based programming models for offloading compute regions 
 from CPU host to GPU devices. These models are referred to as Application Programming 
 Interfaces (APIs), which here enable to communicate between two heterogenous systems 
 (i.e. CPU host and GPU device in our case) and specifically enable offloading to target
@@ -314,7 +313,11 @@ No counterpart  | omp schedule(,)  | to schedule the work for each thread accord
 
 # Discussion on porting OpenACC to OpenMP
 
-This dicussion is inspired by the work .
+The dicussion on converting OpenACC to OpenMP offloading is inspired by the [Clacc project](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/), which is described in the work of [J. Vetter et al.](https://ieeexplore.ieee.org/document/8639349)
+
+Clacc is an open-source OpenACC compiler platform developed by [J. Vetter et al.](https://ieeexplore.ieee.org/document/8639349) and funded by Exascale Computing Project. It has support for [Clang](https://clang.llvm.org/) and [LLVM](https://llvm.org/), and aims at facilitating GPU-programming in its broad use. The key behind the design of Clacc is based on converting OpenACC to OpenMP offloading.   
+
+Clacc is publicly available [here](https://github.com/llvm-doe-org/llvm-project/wiki).
 
 Intel 
 
