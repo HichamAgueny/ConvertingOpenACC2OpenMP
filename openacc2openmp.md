@@ -195,36 +195,58 @@ As in the previous section, we begin by briefly describing the AMD architecture.
 
 ## Comparative study: OpenACC versus OpenMP
 
-OpenACC | OpenMP | Role 
--- | -- | 
-acc parallel | omp target | to execute a compute region on a device
-acc data     | omp target data |                   
-acc parallel loop gang worker vector | omp target teams distribute parallel do (for) |
--- | -- | 
-OpenMP: omp target
+OpenACC | OpenMP | Role |
+-- | -- | -- |
+acc parallel | omp target | to execute a compute region on a device|
+acc parallel loop gang worker vector | omp target teams distribute parallel do (for) | to parallelize a block of loops on a device|
+acc data     | omp target data | to share data between multiple parallel regions in a device|
+-- | -- | -- |
+acc loop | omp teams distribute | to workshare for parallelism on a device|
+acc loop gang | omp teams | to partition a loop accross gangs/teams|
+acc loop worker | omp parallel simd | - - |
+acc loop vector | omp parallel simd | - - |
+-- | --  | -- |
+acc create() | omp map(alloc:) | to allocate a memory for an array in a device|
+acc copy()   | omp map(tofrom:) | to copy arrays from the host to a device and back to the host|
+acc copyin() | omp map(to:) | to copy arrays to a device|
+acc copyout()| omp map(from:) | to copy arrays from a device to the host|
+-- | --  | -- |
+acc reduction(operator:var)| omp reduction(operator:var) | to reduce the number of elements in an array to one value |
+acc collapse(N)  | omp collapse(N)   | to collapse N nested loops into one loop |
+No counterpart  | omp schedule(,)  | to schedule the work for each thread according to the collapsed loops|
 
-Clauses
-OpenACC: acc gang, acc workers, acc vector                     
+```bash
+            **OpenACC**                                |           **OpenMP**
+!$acc data copyin(f) copyout(f_k)                      |  !$omp target data map(to:f) map(from:f_k)
+   do while (max_err.gt.error.and.iter.le.max_iter)    |     do while (max_err.gt.error.and.iter.le.max_iter)
+!$acc parallel loop gang worker vector collapse(2)     |  !$omp target teams distribute parallel do collapse(2) 
+                                                       |        schedule(static,1) 
+      do j=2,ny-1                                      |        do j=2,ny-1 
+        do i=2,nx-1                                    |          do i=2,nx-1 
+           d2fx = f(i+1,j) + f(i-1,j)                  |             d2fx = f(i+1,j) + f(i-1,j)
+           d2fy = f(i,j+1) + f(i,j-1)                  |             d2fy = f(i,j+1) + f(i,j-1) 
+           f_k(i,j) = 0.25*(d2fx + d2fy)               |             f_k(i,j) = 0.25*(d2fx + d2fy)
+        enddo                                          |           enddo
+      enddo                                            |         enddo
+!$acc end parallel                                     |  !$omp end target teams distribute parallel do
+                                                       |
+       max_err=0.                                      |          max_err=0.
+                                                       |
+!$acc parallel loop collapse(2) reduction(max:max_err) |  !$omp target teams distribute parallel do collapse(2) 
+                                                       |         schedule(static,1) reduction(max:max_err) 
+      do j=2,ny-1                                      |        do j=2,ny-1
+        do i=2,nx-1                                    |          do i=2,nx-1
+           max_err = max(dabs(f_k(i,j)-f(i,j)),max_err)|             max_err = max(dabs(f_k(i,j)-f(i,j)),max_err)
+           f(i,j) = f_k(i,j)                           |             f(i,j) = f_k(i,j)
+        enddo                                          |          enddo 
+       enddo                                           |        enddo
+!$acc end parallel                                     |  !$omp end target teams distribute parallel do 
+                                                       |
+       iter = iter + 1                                 |        iter = iter + 1 
+    enddo                                              |     enddo
+!$acc end data                                         |  !$omp end target data
+```
 
-OpenMP: omp teams, ,omp simd
-
-Workshare for acceleration
-acc loop | omp teams distribute |
-acc loop gang | omp teams |
-acc loop worker | omp parallel simd |
-acc loop vector | omp parallel simd |
--- | --  |
-To map variables to a device
-acc create() | omp map(alloc:)
-acc copy()   | omp  map(tofrom:)
-acc copyin() | omp map(to:)
-acc copyout()| omp map(from:)
-
-acc reduction(:)| omp reduction(:)
-acc collapse()  | omp collapse()
-No counterpart              | omp schedule(,)
-
-![image](https://user-images.githubusercontent.com/95568317/148049834-f648b934-dc33-49a0-b7ff-089783e8c3ee.png)
 
 # Discussion on porting OpenACC to OpenMP
 
@@ -271,19 +293,5 @@ $ make omp
 $ srun --account=<your project number> --time=10:00 --mem-per-cpu=1G ./omp 8k 10000
 ``` 
 
-Summary of the execution times
-==========================
 
-Image Size | Iterations |OMP-Directive | CPU time in ms. | GPU time in ms.
--- | -- | -- | -- | --
-1280x720 | 10,000 | -- | 10869.028 | -- 
-1280x720 | 10,000 | `parallel` | 15025.200 | --
-1280x720 | 10,000 | `parallel for` | 542.429 | --
-1280x720 | 10,000 | `target`| -- | 147998.497
-1280x720 | 10,000 | `target teams` | -- | 153735.213
-1280x720 | 10,000 | `target teams parallel for` | -- | 2305.166
-1280x720 | 10,000 | `target teams parallel for collapse` | -- | 2296.626
-1280x720 | 10,000 | `target teams distribute parallel for collapse schedule` | -- | 143.434
-8K	 | 10,000 | `parallel for` |  16722.152 | --
-8k	 | 10,000 | `target teams distribute parallel for collapse schedule` | -- | 881.921
 
