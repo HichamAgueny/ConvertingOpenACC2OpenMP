@@ -190,6 +190,38 @@ As in the previous section, we begin by briefly describing the AMD architecture.
 
 ..... 
 
+```bash
+          **OpenMP without data directive**            |                 **OpenMP with data directive**
+                                                       |  !$omp target data map(to:f) map(from:f_k)
+   do while (max_err.gt.error.and.iter.le.max_iter)    |     do while (max_err.gt.error.and.iter.le.max_iter)
+!$omp target teams distribute parallel do map(to:f)    |  !$omp target teams distribute parallel do collapse(2) 
+      map(from:f_k)                                    |        schedule(static,1) 
+      do j=2,ny-1                                      |        do j=2,ny-1 
+        do i=2,nx-1                                    |          do i=2,nx-1 
+           d2fx = f(i+1,j) + f(i-1,j)                  |             d2fx = f(i+1,j) + f(i-1,j)
+           d2fy = f(i,j+1) + f(i,j-1)                  |             d2fy = f(i,j+1) + f(i,j-1) 
+           f_k(i,j) = 0.25*(d2fx + d2fy)               |             f_k(i,j) = 0.25*(d2fx + d2fy)
+        enddo                                          |           enddo
+      enddo                                            |         enddo
+!$omp end target teams distribute parallel do          |  !$omp end target teams distribute parallel do
+                                                       |
+       max_err=0.                                      |          max_err=0.
+                                                       |
+!$omp target teams distribute parallel do              |  !$omp target teams distribute parallel do collapse(2) 
+      reduction(max:max_err)                           |         schedule(static,1) reduction(max:max_err) 
+      do j=2,ny-1                                      |        do j=2,ny-1
+        do i=2,nx-1                                    |          do i=2,nx-1
+           max_err = max(dabs(f_k(i,j)-f(i,j)),max_err)|             max_err = max(dabs(f_k(i,j)-f(i,j)),max_err)
+           f(i,j) = f_k(i,j)                           |             f(i,j) = f_k(i,j)
+        enddo                                          |          enddo 
+       enddo                                           |        enddo
+!$omp end target teams distribute parallel do          |  !$omp end target teams distribute parallel do 
+                                                       |
+       iter = iter + 1                                 |        iter = iter + 1 
+    enddo                                              |     enddo
+                                                       |  !$omp end target data
+```
+
 ### Compiling and running OpenMP-program
 
 
