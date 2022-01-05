@@ -148,6 +148,35 @@ Fig.1: speed up vs constructs, clauses.
 
 For completness, we provide 
 
+```bash
+          **OpenACC without data locality**            |              **OpenACC with data locality**
+                                                       |  !$acc data copyin(f) copyout(f_k)
+   do while (max_err.gt.error.and.iter.le.max_iter)    |     do while (max_err.gt.error.and.iter.le.max_iter)
+!$acc parallel loop gang worker vector                 |  !$acc parallel loop gang worker vector collapse(2)  
+      do j=2,ny-1                                      |        do j=2,ny-1 
+        do i=2,nx-1                                    |          do i=2,nx-1 
+           d2fx = f(i+1,j) + f(i-1,j)                  |             d2fx = f(i+1,j) + f(i-1,j)
+           d2fy = f(i,j+1) + f(i,j-1)                  |             d2fy = f(i,j+1) + f(i,j-1) 
+           f_k(i,j) = 0.25*(d2fx + d2fy)               |             f_k(i,j) = 0.25*(d2fx + d2fy)
+        enddo                                          |           enddo
+      enddo                                            |         enddo
+!$acc end parallel                                     |  !$acc end parallel
+                                                       |
+       max_err=0.                                      |          max_err=0.
+                                                       |
+!$acc parallel loop                                    |  !$acc parallel loop collapse(2) reduction(max:max_err)  
+      do j=2,ny-1                                      |        do j=2,ny-1
+        do i=2,nx-1                                    |          do i=2,nx-1
+           max_err = max(dabs(f_k(i,j)-f(i,j)),max_err)|             max_err = max(dabs(f_k(i,j)-f(i,j)),max_err)
+           f(i,j) = f_k(i,j)                           |             f(i,j) = f_k(i,j)
+        enddo                                          |          enddo 
+       enddo                                           |        enddo
+!$acc end parallel                                     |  !$acc end parallel 
+                                                       |
+       iter = iter + 1                                 |        iter = iter + 1 
+    enddo                                              |     enddo
+                                                       |  !$acc end data
+```
 
 ### Compiling and running OpenACC-program
 
