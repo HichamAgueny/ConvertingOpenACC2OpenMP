@@ -19,7 +19,7 @@ By the end of this tutorial, the user will be able to:
 *	Use appropriate constructs and clauses on either programming model to offload compute regions to the GPU device.
 *	Select and map regions of a code into a target device.
 *	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
-*	Convert an OpenACC to OpenMP offloading using `clacc` compiler platform.
+*	Get some highlights of the OpenACC-to-OpenMP translation using the `Clacc` compiler platform.
 
 
 # Introduction
@@ -252,8 +252,11 @@ As in the previous section, we begin by briefly describing the AMD architecture.
 
 ### Compiling and running OpenMP-program
 
+Our OpenMP benchmark test runs on AMD Mi100 accelerator....
 
 ## Comparative study: OpenACC versus OpenMP
+
+We compare our OpenACC application agains the OpenMP one. This is summarised below:
 
 In the following we present a direct comparison between the OpenACC and OpenMP offload features. This comparison is shown below and further illustrated in the table, in which we emphsize the meaning of each construct and clause. This direct comparision indicates that converting OpenACC to OpenMP offloading is straightforward. Here, evaluating differences and similarities between OpenACC and OpenMP is a key feature of converting applications from one programming model to another model. A look at OpenACC and OpenMP codes shows that the syntax is so similar, thus making the implemention of the translation procedure at the syntactic level easier.
 
@@ -296,14 +299,18 @@ We thus discuss this conversion procedure in the next section.
 
 OpenACC | OpenMP | Meaning (interpretation) |
 -- | -- | -- |
-acc parallel | omp target | to execute a compute region on a device|
-acc parallel loop gang worker vector | omp target teams distribute parallel do (for) | to parallelize a block of loops on a device|
+acc parallel | omp target teams | to execute a compute region on a device|
+acc kernels  | No explicit counterpart   | - -|
+acc parallel loop gang worker vector | omp target teams distribute parallel do | to parallelize a block of loops on a device|
 acc data     | omp target data | to share data between multiple parallel regions in a device|
 -- | -- | -- |
 acc loop | omp teams distribute | to workshare for parallelism on a device|
-acc loop gang | omp teams | to partition a loop accross gangs/teams|
+acc loop gang | omp teams(num_teams) | to partition a loop accross gangs/teams|
 acc loop worker | omp parallel simd | - - |
 acc loop vector | omp parallel simd | - - |
+num_gangs       | num_teams         | to control how many gangs/teams are created |
+num_workers     | num_threads       | to control how many worker/threads are created in each gang/teams |
+vector_length   | No counterpart    | to control how many data elements can be operated on |
 -- | --  | -- |
 acc create() | omp map(alloc:) | to allocate a memory for an array in a device|
 acc copy()   | omp map(tofrom:) | to copy arrays from the host to a device and back to the host|
@@ -313,11 +320,17 @@ acc copyout()| omp map(from:) | to copy arrays from a device to the host|
 acc reduction(operator:var)| omp reduction(operator:var) | to reduce the number of elements in an array to one value |
 acc collapse(N)  | omp collapse(N)   | to collapse N nested loops into one loop |
 No counterpart  | omp schedule(,)  | to schedule the work for each thread according to the collapsed loops|
+private(var)         | private(var)          | to allocate a copy of the variable `var` on each gang/teams|
+firstprivate    | firstprivate     | to allocate a copy of the variable `var` on each gang/teams and to initialise it with the value of the local thread| 
+
+
 
 
 Fig. depicts ....
 
 # Discussion on porting OpenACC to OpenMP
+
+We now discuss (evaluate) briefly available tools for porting OpenACC to OpenMP. We focus here in providing some highlights about the Clacc compiler platform.
 
 The dicussion on porting OpenACC applications to OpenMP is motivated by the [Clacc project](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/), which is described in the work of [J. Vetter et al.](https://ieeexplore.ieee.org/document/8639349)
 
@@ -356,11 +369,14 @@ The Clacc strategy for interpreting OpenACC is based on one-to-one mapping of [O
 
 The Clacc compiler platform suffers from some limitations, [mainly](https://ieeexplore.ieee.org/document/8639349): (i) translating OpenACC to OpenMP in Clang is currently supported only in C but not yet in C++ nor in Fortran. (ii) Clacc has so far focused primarily on compute constructs, and thus lacks support of data-sharing between the CPU-host and a GPU-device. These limitations however are expected to be overcame in the near future. At the end, the Clacc's design provides an acceptable GPU-performance, as stated [here](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/). Note that Clacc is publicly available [here](https://github.com/llvm-doe-org/llvm-project/wiki).
 
+ the primary objective of the Clacc
+project, as described in §I, is to provide production-quality
+OpenACC support for Clang and LLVM
 
 # Conclusion
 
 
-In conclusion, we have presented an overview of the OpenACC and OpenMP offload features via an application based on solving the Laplace equation in a 2D uniform grid. We have also presented an evaluation of differences and similarties between these two programming models. Furthermore, we have illustrated a one-to-one mapping of OpenACC directives to OpenMP directives in the aim of a conversion procedure between these two models. In this context, we have emphasised the recent development of the Clacc compiler platform aiming for such a convertion procedure, although the platfrom support is so far limited to C and lacks data-transfer in host-device. 
+In conclusion, we have presented an overview of the OpenACC and OpenMP offload features via an application based on solving the Laplace equation in a 2D uniform grid. This benchamrk application was used to experiment the peroformance of some of the basic diretives and clauses in order to highlight the gain of the use of GPU-accelerators, which here was found to be improved by almost a factor of 20. We have also presented an evaluation of differences and similarties between these two programming models. Furthermore, we have illustrated a one-to-one mapping of OpenACC directives to OpenMP directives in the aim of a conversion procedure between these two models. In this context, we have emphasised the recent development of the Clacc compiler platform aiming for such a convertion procedure, although the platfrom support is so far limited to C and lacks data-transfer in host-device. 
 
  Writing an efficient GPU-based program requires some basic knowledge of target architectures and how regions of a program is mapped into the target device. This tutorial thus functions as a benchmark for future advanced GPU-based parallel programming models. 
 
