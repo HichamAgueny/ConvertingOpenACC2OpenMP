@@ -24,7 +24,7 @@ By the end of this tutorial, the user will be able to:
 
 # Introduction
 
-OpenACC and OpenMP are the most popular programming models for heterogeneous computing. OpenACC was developed a decade ago and was designed for parallel programming of heterogenous CPU & GPU systems. Whereas OpenMP is historically known to be directed to shared-memory multi-core programming, and only recently has provided support for heterogenous systems. OpenACC and OpenMP are directive-based programming models for offloading compute regions 
+OpenACC and OpenMP are the most widely used programming models for heterogeneous computing on moderm HPC architectures. OpenACC was developed a decade ago and was designed for parallel programming of heterogenous CPU & GPU systems. Whereas OpenMP is historically known to be directed to shared-memory multi-core programming, and only recently has provided support for heterogenous systems. OpenACC and OpenMP are directive-based programming models for offloading compute regions 
 from CPU host to GPU devices. These models are referred to as Application Programming 
 Interfaces (APIs), which here enable to communicate between two heterogenous systems 
 (i.e. CPU host and GPU device in our case) and specifically enable offloading to target
@@ -255,7 +255,11 @@ As in the previous section, we begin by briefly describing the AMD architecture.
 
 ## Comparative study: OpenACC versus OpenMP
 
-In the following we present a direct comparison between the OpenACC and OpenMP offload features. This comparison is shown below and further illustrated in the table, in which we emphsize the meaning of each construct and clause. This direct comparision indicates that converting OpenACC to OpenMP offloading is straightforward. We thus discuss this conversion procedure in the next section.
+In the following we present a direct comparison between the OpenACC and OpenMP offload features. This comparison is shown below and further illustrated in the table, in which we emphsize the meaning of each construct and clause. This direct comparision indicates that converting OpenACC to OpenMP offloading is straightforward. Here, evaluating differences and similarities between OpenACC and OpenMP is a key feature of converting applications from one programming model to another model. A look at OpenACC and OpenMP codes shows that the syntax is so similar, thus making the implemention of the translation procedure at the syntactic level easier.
+
+such a study is cretical for determining the correct mappings to OpenMP and it implementation in Clang.
+
+We thus discuss this conversion procedure in the next section.
 
 
 ```bash
@@ -290,7 +294,7 @@ In the following we present a direct comparison between the OpenACC and OpenMP o
 !$acc end data                                         |  !$omp end target data
 ```
 
-OpenACC | OpenMP | Role |
+OpenACC | OpenMP | Meaning (interpretation) |
 -- | -- | -- |
 acc parallel | omp target | to execute a compute region on a device|
 acc parallel loop gang worker vector | omp target teams distribute parallel do (for) | to parallelize a block of loops on a device|
@@ -311,20 +315,54 @@ acc collapse(N)  | omp collapse(N)   | to collapse N nested loops into one loop 
 No counterpart  | omp schedule(,)  | to schedule the work for each thread according to the collapsed loops|
 
 
+Fig. depicts ....
+
 # Discussion on porting OpenACC to OpenMP
 
-The dicussion on converting OpenACC to OpenMP offloading is inspired by the [Clacc project](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/), which is described in the work of [J. Vetter et al.](https://ieeexplore.ieee.org/document/8639349)
+The dicussion on porting OpenACC applications to OpenMP is motivated by the [Clacc project](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/), which is described in the work of [J. Vetter et al.](https://ieeexplore.ieee.org/document/8639349)
 
 Clacc is an open-source OpenACC compiler platform developed by [J. Vetter et al.](https://ieeexplore.ieee.org/document/8639349) and funded by Exascale Computing Project. It has support for [Clang](https://clang.llvm.org/) and [LLVM](https://llvm.org/), and aims at facilitating GPU-programming in its broad use. The key behind the design of Clacc is based on converting OpenACC to OpenMP offloading.   
 
-Clacc is publicly available [here](https://github.com/llvm-doe-org/llvm-project/wiki).
+The Clacc's design is summerised below:
 
-Intel 
+The design take advantage of the existing OpenMP debugging tools to be re-used for OpenACC.
+
+automated porting of OpenACC applications to OpenMP, and reuse of existing OpenMP tools. 
+
+studying each OpenACC feature, determining
+a correct mapping to OpenMP, implementing it in Clang
+
+For example,
+when trying to translate an acc parallel construct to an
+omp target teams construct using this alternative, Clang’s
+OpenMP implementation required us to insert child nodes
+representing two captured regions, one for each of omp
+target and omp teams, as parents of the associated code
+block. 
+
+the choice of how to map a particular OpenACC directive to
+OpenMP must be made immediately in order to construct the
+subtree correctly
+
+Clacc was designed to mimic the exact behavior of OpenMP and as explicit as possible. for
+the sake of debugging
+
+OpenACC is defined as a descriptive language: the OpenACC compiler has to perform analyses in order to interprete data flow, loop nests, and other control flow
+in the application source and to determine efficient strategies for scheduling work on the offloading device. Therefore, the Clacc compiler needs to perform those analyses in order to rend OpenACC a prescriptive language of OpenMP.
+
+while OpenMP is a prescriptive language.
+
+The Clacc strategy for interpreting OpenACC is based on one-to-one mapping of [OpenACC directives to OpenMP directives](https://ieeexplore.ieee.org/document/8639349) as we have already shown in the table.
+
+The Clacc compiler platform suffers from some limitations, [mainly](https://ieeexplore.ieee.org/document/8639349): (i) translating OpenACC to OpenMP in Clang is currently supported only in C but not yet in C++ nor in Fortran. (ii) Clacc has so far focused primarily on compute constructs, and thus lacks support of data-sharing between the CPU-host and a GPU-device. These limitations however are expected to be overcame in the near future. At the end, the Clacc's design provides an acceptable GPU-performance, as stated [here](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/). Note that Clacc is publicly available [here](https://github.com/llvm-doe-org/llvm-project/wiki).
+
 
 # Conclusion
 
 
-In conclusion, we have presented in the aim of converting OpenACC to OpenMP offloading. Writing an efficient GPU-based program requires some basic knowledge of target architectures and how regions of a program is mapped into the target device. This tutorial thus functions as a benchmark for future advanced GPU-based parallel programming models. 
+In conclusion, we have presented an overview of the OpenACC and OpenMP offload features via an application based on solving the Laplace equation in a 2D uniform grid. We have also presented an evaluation of differences and similarties between these two programming models. Furthermore, we have illustrated a one-to-one mapping of OpenACC directives to OpenMP directives in the aim of a conversion procedure between these two models. In this context, we have emphasised the recent development of the Clacc compiler platform aiming for such a convertion procedure, although the platfrom support is so far limited to C and lacks data-transfer in host-device. 
+
+ Writing an efficient GPU-based program requires some basic knowledge of target architectures and how regions of a program is mapped into the target device. This tutorial thus functions as a benchmark for future advanced GPU-based parallel programming models. 
 
 
 
