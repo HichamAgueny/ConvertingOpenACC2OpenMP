@@ -21,7 +21,7 @@ By the end of this tutorial, the user will be able to:
 *	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
 *	Get some highlights of the OpenACC-to-OpenMP translation using the `Clacc` compiler platform.
 
-![The San Juan Mountains are beautiful!](https://github.com/HichamAgueny/ConvertingOpenACC2OpenMP/fig1L-R.pdf.pdf "San Juan Mountains")
+![software and hardware scheme!](https://github.com/HichamAgueny/ConvertingOpenACC2OpenMP/blob/main/fig1L-R.pdf?raw=true "Title")
 
 # Introduction
 
