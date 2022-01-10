@@ -21,7 +21,6 @@ By the end of this tutorial, the user will be able to:
 *	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
 *	Get some highlights of the OpenACC-to-OpenMP translation using the `Clacc` compiler platform.
 
-![software and hardware scheme!](https://github.com/HichamAgueny/ConvertingOpenACC2OpenMP/blob/main/fig1L-R.pdf?raw=true "Title")
 
 # Introduction
 
@@ -99,6 +98,8 @@ In the following we cover both the implementation of the OpenACC model to accele
 
 We begin first by illustarting the functionality of the OpenACC model in terms of parallelism, which is implemented via the directives **kernels** or **parallel loop**. The concept of parallelism functions via the generic directives: **gang**, **worker** and **vector** as schematically represented in Fig. 1 (left-hand side). Here, the compiler initiates the parallelism by generating parallel gangs, in which each gang consists of a set of workers represented by a matrix of threads. This group of threads within a gang execute the same instruction (SIMT, Single Instruction Multiple Threads) via the vectorization process. In this scenario, a block of loops is assigned to each gang, which gets vectorized and executed redundantly by a group of threads.  
 
+![GPU-architecture!](https://user-images.githubusercontent.com/95568317/148845581-c26887d0-8feb-4ce1-8ab8-a2bec9181c8c.png "GPU-architecture")
+
 In the hardware picture, a GPU-device consists of a block of Compute Units (CUs) (CU is a general term for a Streaming Multiprocessor, SM) each of which is organized as a matrix of Processing Elements (PEs) (PE is a general term for a CUDA core), as shown in Fig. 1 (right-hand side). As an example, the [NVIDIA P100 GPU-accelerators](https://images.nvidia.com/content/tesla/pdf/nvidia-tesla-p100-PCIe-datasheet.pdf) [see also [here](http://web.engr.oregonstate.edu/~mjb/cs575/Handouts/gpu101.2pp.pdf)] have 56 CUs (or 56 SMs) and each CU has 64 PEs (or 64 CUDA cores) with a total of 3584 PEs (i.e. 3584 FP32 cores/GPU or 1792 FP64 cores/GPU), while the [NVIDIA V100](https://images.nvidia.com/content/technologies/volta/pdf/volta-v100-datasheet-update-us-1165301-r5.pdf) has 80 CUs and each CU has 64 PEs with a total of 5120 PEs (5120 FP32/GPU or 2560 FP64/GPU), where FP32 and FP64 correspond to the single-precision Floating Point (FP) (i.e. 32 bit) and double precision (64 bit), respectively. 
 
 The execution of the parallelism is mapped on the GPU-device in the following: each compute unit is associated to one gang of threads generated via the directive **gang**, in which a block of loops is assigned to. In addition, each block of loops is run on the processing element via the directive **vector**. In short, the role of these directives for processing the parallelism is summarized [here](https://www.openacc.org/sites/default/files/inline-files/OpenACC_Programming_Guide_0_0.pdf): 
@@ -139,15 +140,6 @@ In the scenario shown in Fig. 3 (left-hand side), only the directive **parallel 
 
 Once can also introduce explicit control of the parallelism. This can be achieved by incorporating the clauses: `gang`, `worker` and `vector`. 
 
-Fig. 2 serial, kernels, parallel loop, vs full implementation 
-
-
-Fig.1: speed up vs constructs, clauses.  
-
-![Tux, the Linux mascot](/assets/images/tux.png)
-
-![The San Juan Mountains are beautiful!](/assets/fig1L-R.pdf.pdf "San Juan Mountains")
-
 For completness, we provide 
 
 ```bash
@@ -179,6 +171,15 @@ For completness, we provide
     enddo                                              |     enddo
                                                        |  !$acc end data
 ```
+Fig. 2 serial, kernels, parallel loop, vs full implementation 
+
+![fig-acc](https://user-images.githubusercontent.com/95568317/148846246-39e4610e-1878-4812-8850-551b12c5e0b4.jpeg)
+
+Fig.1: speed up vs constructs, clauses.  
+
+![Tux, the Linux mascot](/assets/images/tux.png)
+
+![bhkknknk!](/assets/fig1L-R.pdf.pdf "xxxxxxxxx")
 
 ### Compiling and running OpenACC-program
 
@@ -252,6 +253,8 @@ As in the previous section, we begin by briefly describing the AMD architecture.
     enddo                                              |     enddo
                                                        |  !$omp end target data
 ```
+
+![fig-omp](https://user-images.githubusercontent.com/95568317/148846520-6b1f8540-abf1-4953-9677-f72c347cc5cc.jpg)
 
 ### Compiling and running OpenMP-program
 
