@@ -21,7 +21,6 @@ By the end of this tutorial, the user will be able to:
 *	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
 *	Get some highlights of the OpenACC-to-OpenMP translation using the `Clacc` compiler platform.
 
-
 # Introduction
 
 OpenACC and OpenMP are the most widely used programming models for heterogeneous computing on moderm HPC architectures. OpenACC was developed a decade ago and was designed for parallel programming of heterogenous CPU & GPU systems. Whereas OpenMP is historically known to be directed to shared-memory multi-core programming, and only recently has provided support for heterogenous systems. OpenACC and OpenMP are directive-based programming models for offloading compute regions 
@@ -61,9 +60,9 @@ $$\frac{\partial^{2} f(x,y)}{\partial^{2} x}=$\frac{f(x_{i+1},y) - 2f(x_{i},y) +
 ```
 
 The Eq.(x) can be further simplified and takes the final form
-```math
+
 $$f(x_i,y_j)=\frac{f(x_{i+1},y) + f(x_{i-1},y) + f(x,y_{i+1}) + f(x,y_{i-1})}{4}$$
-```
+
 
 The Eq. (xx) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid having 8192 points in both `x` and `y` directions. The compute code is written in *Fortran 90* and a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc). The serial code can be written as
 
@@ -144,6 +143,8 @@ Fig. 2 serial, kernels, parallel loop, vs full implementation
 Fig.1: speed up vs constructs, clauses.  
 
 ![Tux, the Linux mascot](/assets/images/tux.png)
+
+![The San Juan Mountains are beautiful!](/assets/images/san-juan-mountains.jpg "San Juan Mountains")
 
 For completness, we provide 
 
