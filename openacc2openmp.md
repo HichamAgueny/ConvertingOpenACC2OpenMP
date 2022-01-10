@@ -21,6 +21,8 @@ By the end of this tutorial, the user will be able to:
 *	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
 *	Get some highlights of the OpenACC-to-OpenMP translation using the `Clacc` compiler platform.
 
+![The San Juan Mountains are beautiful!](https://github.com/HichamAgueny/ConvertingOpenACC2OpenMP/fig1L-R.pdf.pdf "San Juan Mountains")
+
 # Introduction
 
 OpenACC and OpenMP are the most widely used programming models for heterogeneous computing on moderm HPC architectures. OpenACC was developed a decade ago and was designed for parallel programming of heterogenous CPU & GPU systems. Whereas OpenMP is historically known to be directed to shared-memory multi-core programming, and only recently has provided support for heterogenous systems. OpenACC and OpenMP are directive-based programming models for offloading compute regions 
@@ -144,7 +146,7 @@ Fig.1: speed up vs constructs, clauses.
 
 ![Tux, the Linux mascot](/assets/images/tux.png)
 
-![The San Juan Mountains are beautiful!](/assets/images/san-juan-mountains.jpg "San Juan Mountains")
+![The San Juan Mountains are beautiful!](/assets/fig1L-R.pdf.pdf "San Juan Mountains")
 
 For completness, we provide 
 
