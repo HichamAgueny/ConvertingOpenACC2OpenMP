@@ -255,10 +255,19 @@ As in the previous section, we begin by briefly describing the AMD architecture.
 
 ![fig-omp](https://user-images.githubusercontent.com/95568317/148846520-6b1f8540-abf1-4953-9677-f72c347cc5cc.jpg)
 
+(https://documentation.sigma2.no/code_development/guides/ompoffload.html)
+
 ### Compiling and running OpenMP-program
 
-Our OpenMP benchmark test runs on AMD Mi100 accelerator....
+Our OpenMP benchmark test runs on AMD Mi100 accelerator. The syntax of the compilation process can be written in the following form (see [here](https://gitlab.sigma2.no/teams/gpu/planning/-/issues/41) for more details):
 
+flang -fopenmp=libomp -fopenmp-targets=<target> -Xopenmp-target=<target> -march=<arch> laplace_omp.f90
+ 
+The flag -fopenmp activates the OpenMP directives (i.e. !$omp [construct] in Fortran). The option -fopenmp-targets=<target> is used to enable the target offloading to GPU-accelerators and tells the Flang compiler to use <target>=amdgcn-amd-amdhsa as the AMD target. The -Xopenmp-target flag enables options to be passed to the target offloading toolchain. In addition, we need to specify the architecture of the GPU to be used. This is done via the flag -march=<arch>, where <arch> specifies the name of the GPU-architecture. This characteristic feature can be extracted from the machine via the command `rocminfo` for the AMD device. These commands provide a general view of the GPU-accelerator and additional related information. For instance, the AMD Mi100 accelerator architecture is specified by the flag -march=gfx908 amd-arch.   
+
+Note that the compilation process requires loading the module `AOMP/13.0-2-GCCcore-10.2.0` or a newer version.
+
+ 
 ## Mapping OpenACC to OpenMP
 
 We compare our OpenACC application agains the OpenMP one. This is summarised below:
