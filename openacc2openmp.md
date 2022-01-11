@@ -141,6 +141,8 @@ In the scenario shown in Fig. 3 (left-hand side), only the directive **parallel 
 
 Once can also introduce explicit control of the parallelism. This can be achieved by incorporating the clauses: `gang`, `worker` and `vector`. 
 
+`todo: how to add colors in the bash code`
+
 ```bash
           **OpenACC without data locality**            |              **OpenACC with data locality**
                                                        |  !$acc data copyin(f) copyout(f_k)
@@ -170,15 +172,11 @@ Once can also introduce explicit control of the parallelism. This can be achieve
     enddo                                              |     enddo
                                                        |  !$acc end data
 ```
-Fig. 2 serial, kernels, parallel loop, vs full implementation 
 
-![fig-acc](https://user-images.githubusercontent.com/95568317/148846246-39e4610e-1878-4812-8850-551b12c5e0b4.jpeg)
+`todo: how to write Fig. 1` 
 
-Fig.1: speed up vs constructs, clauses.  
+![Performance of different OpenACC directives](https://user-images.githubusercontent.com/95568317/148846246-39e4610e-1878-4812-8850-551b12c5e0b4.jpeg)
 
-![Tux, the Linux mascot](/assets/images/tux.png)
-
-![bhkknknk!](/assets/fig1L-R.pdf.pdf "xxxxxxxxx")
 
 ### Compiling and running OpenACC-program
 
@@ -211,11 +209,21 @@ module load NVHPC/21.2
  
 $ srun ./laplace_acc.exe
 ```
-In the script above, the option `partition--accell` enables the access to the GPU, as already shown [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc). One can also use the command `sinfo` to get information about which nodes are connected to the GPU. 
+In the script above, the option `partition--accell` enables the access to the GPU, as already shown [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc). One can also use the command `sinfo` to get information about which nodes are connected to the GPUs. 
 
 ## Experiment on OpenMP offloading
 
-In this section, we carry out an experiment on OpenMP offloading by adopting the same scenario as in the previous section but with the use of a different GPU-architecture. The implementation is done on the AMD Mi100 accelerator. 
+In this section, we carry out an experiment on [OpenMP](https://www.openmp.org/wp-content/uploads/OpenMP-API-Specification-5-1.pdf) offloading by adopting the same scenario as in the previous section but with the use of a different GPU-architecture: AMD Mi100 accelerator. The functionality of OpenMP is somewhat similar to the one of OpenACC as schematically presented above. In the OpenMP concept, a block of loops is offloaded to a device via the construct **target**. A set of threads is then created on each compute unit (CU) by means of the directive **teams** to execute the offloaded region. Here, the offloaded region (i.e. block of loops) gets assigned to teams via the clause **distribute**, and get executed on the processing elements by means of the directive **parallel do simd**.  
+
+The implementation of the OpenMP application is shown below for two cases: (i) OpenMP without introducing the data directive and (ii) OpenMP with the data directive. This Comparison allows us to identify the role of data management during the data-transfer between the host and a device,  which in turn permits to get some insights into the performance of the OpenMP features. As in the previous section, we begin by parallelising the looped regions. This is done first by transferring the control of a compute region to a device via the construct `target teams` and then performing the parallelism via the `` 
+
+The performance is presented in Fig. 
+
+copy arrays from the host to the device and back to the host at the end of the loop. This process will repeat itself at each iteration
+
+The description of the constructs and clauses implemented in our application is provided in the table below.
+
+An additonal application on OpenMP offloading can be found [here](https://documentation.sigma2.no/code_development/guides/ompoffload.html)
 
 As in the previous section, we begin by briefly describing the AMD architecture. This is schematically illustrated in Fig. 1. Here one can see that each block 
 
@@ -225,8 +233,8 @@ As in the previous section, we begin by briefly describing the AMD architecture.
           **OpenMP without data directive**            |                 **OpenMP with data directive**
                                                        |  !$omp target data map(to:f) map(from:f_k)
    do while (max_err.gt.error.and.iter.le.max_iter)    |     do while (max_err.gt.error.and.iter.le.max_iter)
-!$omp target teams distribute parallel do map(to:f)    |  !$omp target teams distribute parallel do collapse(2) 
-      map(from:f_k)                                    |        schedule(static,1) 
+!$omp target teams distribute parallel do simd         |  !$omp target teams distribute parallel do simd collapse(2) 
+      map(to:f) map(from:f_k)                          |        schedule(static,1) 
       do j=2,ny-1                                      |        do j=2,ny-1 
         do i=2,nx-1                                    |          do i=2,nx-1 
            d2fx = f(i+1,j) + f(i-1,j)                  |             d2fx = f(i+1,j) + f(i-1,j)
@@ -234,11 +242,11 @@ As in the previous section, we begin by briefly describing the AMD architecture.
            f_k(i,j) = 0.25*(d2fx + d2fy)               |             f_k(i,j) = 0.25*(d2fx + d2fy)
         enddo                                          |           enddo
       enddo                                            |         enddo
-!$omp end target teams distribute parallel do          |  !$omp end target teams distribute parallel do
+!$omp end target teams distribute parallel do simd     |  !$omp end target teams distribute parallel do simd
                                                        |
        max_err=0.                                      |          max_err=0.
                                                        |
-!$omp target teams distribute parallel do              |  !$omp target teams distribute parallel do collapse(2) 
+!$omp target teams distribute parallel do simd         |  !$omp target teams distribute parallel do simd collapse(2) 
       reduction(max:max_err)                           |         schedule(static,1) reduction(max:max_err) 
       do j=2,ny-1                                      |        do j=2,ny-1
         do i=2,nx-1                                    |          do i=2,nx-1
@@ -246,16 +254,16 @@ As in the previous section, we begin by briefly describing the AMD architecture.
            f(i,j) = f_k(i,j)                           |             f(i,j) = f_k(i,j)
         enddo                                          |          enddo 
        enddo                                           |        enddo
-!$omp end target teams distribute parallel do          |  !$omp end target teams distribute parallel do 
+!$omp end target teams distribute parallel do simd     |  !$omp end target teams distribute parallel do simd
                                                        |
        iter = iter + 1                                 |        iter = iter + 1 
     enddo                                              |     enddo
                                                        |  !$omp end target data
 ```
 
-![fig-omp](https://user-images.githubusercontent.com/95568317/148846520-6b1f8540-abf1-4953-9677-f72c347cc5cc.jpg)
+![Performance of different OpenMP directives](https://user-images.githubusercontent.com/95568317/148846520-6b1f8540-abf1-4953-9677-f72c347cc5cc.jpg)
 
-(https://documentation.sigma2.no/code_development/guides/ompoffload.html)
+
 
 ### Compiling and running OpenMP-program
 
@@ -278,12 +286,13 @@ We present a direct comparison between the OpenACC and OpenMP offload features. 
 
 We thus discuss this conversion procedure in the next section.
 
-
+todo: use different colors
+ 
 ```bash
                     **OpenACC**                        |                    **OpenMP**
 !$acc data copyin(f) copyout(f_k)                      |  !$omp target data map(to:f) map(from:f_k)
    do while (max_err.gt.error.and.iter.le.max_iter)    |     do while (max_err.gt.error.and.iter.le.max_iter)
-!$acc parallel loop gang worker vector collapse(2)     |  !$omp target teams distribute parallel do collapse(2) 
+!$acc parallel loop gang worker vector collapse(2)     |  !$omp target teams distribute parallel do simd collapse(2) 
                                                        |        schedule(static,1) 
       do j=2,ny-1                                      |        do j=2,ny-1 
         do i=2,nx-1                                    |          do i=2,nx-1 
@@ -292,11 +301,11 @@ We thus discuss this conversion procedure in the next section.
            f_k(i,j) = 0.25*(d2fx + d2fy)               |             f_k(i,j) = 0.25*(d2fx + d2fy)
         enddo                                          |           enddo
       enddo                                            |         enddo
-!$acc end parallel                                     |  !$omp end target teams distribute parallel do
+!$acc end parallel                                     |  !$omp end target teams distribute parallel do simd
                                                        |
        max_err=0.                                      |          max_err=0.
                                                        |
-!$acc parallel loop collapse(2) reduction(max:max_err) |  !$omp target teams distribute parallel do collapse(2) 
+!$acc parallel loop collapse(2) reduction(max:max_err) |  !$omp target teams distribute parallel do simd collapse(2) 
                                                        |         schedule(static,1) reduction(max:max_err) 
       do j=2,ny-1                                      |        do j=2,ny-1
         do i=2,nx-1                                    |          do i=2,nx-1
@@ -304,18 +313,18 @@ We thus discuss this conversion procedure in the next section.
            f(i,j) = f_k(i,j)                           |             f(i,j) = f_k(i,j)
         enddo                                          |          enddo 
        enddo                                           |        enddo
-!$acc end parallel                                     |  !$omp end target teams distribute parallel do 
+!$acc end parallel                                     |  !$omp end target teams distribute parallel do simd
                                                        |
        iter = iter + 1                                 |        iter = iter + 1 
     enddo                                              |     enddo
 !$acc end data                                         |  !$omp end target data
 ```
 
-OpenACC | OpenMP | Meaning (interpretation) |
+OpenACC | OpenMP | interpretation |
 -- | -- | -- |
 acc parallel | omp target teams | to execute a compute region on a device|
 acc kernels  | No explicit counterpart   | - -|
-acc parallel loop gang worker vector | omp target teams distribute parallel do | to parallelize a block of loops on a device|
+acc parallel loop gang worker vector | omp target teams distribute parallel do simd | to parallelize a block of loops on a device|
 acc data     | omp target data | to share data between multiple parallel regions in a device|
 -- | -- | -- |
 acc loop | omp teams distribute | to workshare for parallelism on a device|
@@ -338,6 +347,7 @@ private(var)         | private(var)          | to allocate a copy of the variabl
 firstprivate    | firstprivate     | to allocate a copy of the variable `var` on each gang/teams and to initialise it with the value of the local thread| 
 
 
+Details about OpenACC and OpenMP library routines can be found, respectively, [here] and [here].
 
 For completness, we provide 
 
@@ -349,7 +359,7 @@ For completness, we provide in this section some highlights of the available ope
 
 Clacc is an open-source OpenACC compiler platform that has support for [Clang](https://clang.llvm.org/) and [LLVM](https://llvm.org/), and aims at facilitating GPU-programming in its broad use. The key behind the design of Clacc is based on converting OpenACC to OpenMP, taking advantage of the existing OpenMP debugging tools to be re-used for OpenACC. Clacc was designed to mimic the exact behavior of OpenMP as explicit as possible. The Clacc strategy for interpreting OpenACC is based on one-to-one mapping of [OpenACC directives to OpenMP directives](https://ieeexplore.ieee.org/document/8639349) as we have already shown in the table above.
 
-Despite the new development of Clacc compiler platform, it suffers from some limitations, [mainly](https://ieeexplore.ieee.org/document/8639349): (i) translating OpenACC to OpenMP in Clang is currently supported only in C but not yet in C++ nor in Fortran. (ii) Clacc has so far focused primarily on compute constructs, and thus lacks support of data-sharing between the CPU-host and a GPU-device. These limitations however are expected to be overcame in the near future. So far, Clacc has been tested and benchmarked against a series of different configuartions, and it is found to provide an acceptable GPU-performance, as stated [here](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/). Note that Clacc is publicly available [here](https://github.com/llvm-doe-org/llvm-project/wiki).
+Despite the new development of Clacc compiler platform, it suffers from some limitations, [mainly](https://ieeexplore.ieee.org/document/8639349): (i) translating OpenACC to OpenMP in Clang/Flang is currently supported only in C and Fortran but not yet in C++. (ii) Clacc has so far focused primarily on compute constructs, and thus lacks support of data-sharing between the CPU-host and a GPU-device. These limitations however are expected to be overcame in the near future. So far, Clacc has been tested and benchmarked against a series of different configuartions, and it is found to provide an acceptable GPU-performance, as stated [here](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/). Note that Clacc is publicly available [here](https://github.com/llvm-doe-org/llvm-project/wiki).
 
  
 
