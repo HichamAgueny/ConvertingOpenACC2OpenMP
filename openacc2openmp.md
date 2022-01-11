@@ -62,8 +62,9 @@ $$\frac{\partial^{2} f(x,y)}{\partial^{2} x}=$\frac{f(x_{i+1},y) - 2f(x_{i},y) +
 
 The Eq.(x) can be further simplified and takes the final form
 
+```math
 $$f(x_i,y_j)=\frac{f(x_{i+1},y) + f(x_{i-1},y) + f(x,y_{i+1}) + f(x,y_{i-1})}{4}$$
-
+```
 
 The Eq. (xx) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid having 8192 points in both `x` and `y` directions. The compute code is written in *Fortran 90* and a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc). The serial code can be written as
 
@@ -344,9 +345,9 @@ Despite the new development of Clacc compiler platform, it suffers from some lim
 # Conclusion
 
 
-In conclusion, we have presented an overview of the OpenACC and OpenMP offload features via an application based on solving the Laplace equation in a 2D uniform grid. This benchamrk application was used to experiment the peroformance of some of the basic diretives and clauses in order to highlight the gain of the use of GPU-accelerators, which here was found to be improved by almost a factor of 20. We have also presented an evaluation of differences and similarties between these two programming models. Furthermore, we have illustrated a one-to-one mapping of OpenACC directives to OpenMP directives in the aim of a conversion procedure between these two models. In this context, we have emphasised the recent development of the Clacc compiler platform aiming for such a convertion procedure, although the platfrom support is so far limited to C and lacks data-transfer in host-device. 
+In conclusion, we have presented an overview of the OpenACC and OpenMP offload features via an application based on solving the Laplace equation in a 2D uniform grid. This benchamrk application was used to experiment the peroformance of some of the basic diretives and clauses in order to highlight the gain behind the use of GPU-accelerators. The performance here was found to be improved by almost a factor of 20. We have also presented an evaluation of differences and similarties between OpenACC and OpenMP programming models. Furthermore, we have illustrated a one-to-one mapping of OpenACC directives to OpenMP directives in the aim of a conversion procedure between these two models. In this context, we have emphasised the recent development of the Clacc compiler platform aiming for such a convertion procedure, although the platfrom support is so far limited to C and lacks data-transfer in host-device. 
 
- Writing an efficient GPU-based program requires some basic knowledge of target architectures and how regions of a program is mapped into the target device. This tutorial thus functions as a benchmark for future advanced GPU-based parallel programming models. 
+Last but not least, writing an efficient GPU-based program requires some basic knowledge of the target architectures and how regions of a program is mapped into a target device. This tutorial thus was designed to provide such basic knowledge in the aim of triggering the interest of users to GPU-programming. It thus functions as a benchmark for future advanced GPU-based parallel programming models. 
 
 
 
