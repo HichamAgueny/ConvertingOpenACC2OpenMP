@@ -140,8 +140,6 @@ In the scenario shown in Fig. 3 (left-hand side), only the directive **parallel 
 
 Once can also introduce explicit control of the parallelism. This can be achieved by incorporating the clauses: `gang`, `worker` and `vector`. 
 
-For completness, we provide 
-
 ```bash
           **OpenACC without data locality**            |              **OpenACC with data locality**
                                                        |  !$acc data copyin(f) copyout(f_k)
@@ -260,13 +258,11 @@ As in the previous section, we begin by briefly describing the AMD architecture.
 
 Our OpenMP benchmark test runs on AMD Mi100 accelerator....
 
-## Comparative study: OpenACC versus OpenMP
+## Mapping OpenACC to OpenMP
 
 We compare our OpenACC application agains the OpenMP one. This is summarised below:
 
-In the following we present a direct comparison between the OpenACC and OpenMP offload features. This comparison is shown below and further illustrated in the table, in which we emphsize the meaning of each construct and clause. This direct comparision indicates that converting OpenACC to OpenMP offloading is straightforward. Here, evaluating differences and similarities between OpenACC and OpenMP is a key feature of converting applications from one programming model to another model. A look at OpenACC and OpenMP codes shows that the syntax is so similar, thus making the implemention of the translation procedure at the syntactic level easier.
-
-such a study is cretical for determining the correct mappings to OpenMP and it implementation in Clang.
+We present a direct comparison between the OpenACC and OpenMP offload features. This comparison is shown below and further illustrated in the table, in which we emphasise the meaning of some of the basic constructs and clauses underlying our application. Here, evaluating the behavior of OpenACC and OpenMP by one-to-one mapping is a key feature of the convertion procedure. A closer look at OpenACC and OpenMP codes reveals some similarities and differences in terms of constructs and clauses as summerised in the table. In particular, it shows that the syntax of both programming models is so similar, thus making the implemention of the translation procedure at the syntactic level straightforward. Therefore, such a Comparison is critical for determining the correct mappings to OpenMP.
 
 We thus discuss this conversion procedure in the next section.
 
@@ -331,16 +327,22 @@ firstprivate    | firstprivate     | to allocate a copy of the variable `var` on
 
 
 
+For completness, we provide 
 
 Fig. depicts ....
 
 # Discussion on porting OpenACC to OpenMP
 
-We now discuss (evaluate) briefly available tools for porting OpenACC to OpenMP. We focus here in providing some highlights about the Clacc compiler platform.
+For completness, we now discuss (evaluate) briefly available tools for porting OpenACC to OpenMP. We focus here in providing some highlights about the Clacc compiler platform.
 
-The dicussion on porting OpenACC applications to OpenMP is motivated by the [Clacc project](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/), which is described in the work of [J. Vetter et al.](https://ieeexplore.ieee.org/document/8639349)
+For completness, we provide in this section a brief overview of some of the available open-source tools that provide support of OpenACC in terms of compilers and hardwares. According to the work of [J. Vetter et al.](https://ieeexplore.ieee.org/document/8639349) and the [OpenACC website](https://www.openacc.org/tools), the only open-source OpenACC compiler that supports offloading to various GPU-archeterctures (i.e. NVIDIA, AMD, Intel...) is GCC 10. In addition to the GCC compiler, there has been recently an effort in developing an open-source compiler called [Clacc](https://ieeexplore.ieee.org/document/8639349). This effort is funded by Exascale Computing Project: [Clacc project](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/), which is described in the work of [J. Vetter et al.](https://ieeexplore.ieee.org/document/8639349). We thus focus here in providing some highlights of the Clacc compiler platform.
 
-Clacc is an open-source OpenACC compiler platform developed by [J. Vetter et al.](https://ieeexplore.ieee.org/document/8639349) and funded by Exascale Computing Project. It has support for [Clang](https://clang.llvm.org/) and [LLVM](https://llvm.org/), and aims at facilitating GPU-programming in its broad use. The key behind the design of Clacc is based on converting OpenACC to OpenMP offloading.   
+Clacc is an open-source OpenACC compiler platform that has support for [Clang](https://clang.llvm.org/) and [LLVM](https://llvm.org/), and aims at facilitating GPU-programming in its broad use. The key behind the design of Clacc is based on converting OpenACC to OpenMP, taking advantage of the existing OpenMP debugging tools to be re-used for OpenACC. Clacc was designed to mimic the exact behavior of OpenMP and as explicit as possible. The Clacc strategy for interpreting OpenACC is based on one-to-one mapping of [OpenACC directives to OpenMP directives](https://ieeexplore.ieee.org/document/8639349) as we have already shown in the table above.
+
+Despite the new development of Clacc compiler platform, it suffers from some limitations, [mainly](https://ieeexplore.ieee.org/document/8639349): (i) translating OpenACC to OpenMP in Clang is currently supported only in C but not yet in C++ nor in Fortran. (ii) Clacc has so far focused primarily on compute constructs, and thus lacks support of data-sharing between the CPU-host and a GPU-device. These limitations however are expected to be overcame in the near future. At the end, the Clacc's design provides an acceptable GPU-performance, as stated [here](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/). Note that Clacc is publicly available [here](https://github.com/llvm-doe-org/llvm-project/wiki).
+
+
+The Clacc's design is based on 
 
 The Clacc's design is summerised below:
 
@@ -371,7 +373,7 @@ in the application source and to determine efficient strategies for scheduling w
 
 while OpenMP is a prescriptive language.
 
-The Clacc strategy for interpreting OpenACC is based on one-to-one mapping of [OpenACC directives to OpenMP directives](https://ieeexplore.ieee.org/document/8639349) as we have already shown in the table.
+
 
 The Clacc compiler platform suffers from some limitations, [mainly](https://ieeexplore.ieee.org/document/8639349): (i) translating OpenACC to OpenMP in Clang is currently supported only in C but not yet in C++ nor in Fortran. (ii) Clacc has so far focused primarily on compute constructs, and thus lacks support of data-sharing between the CPU-host and a GPU-device. These limitations however are expected to be overcame in the near future. At the end, the Clacc's design provides an acceptable GPU-performance, as stated [here](https://www.exascaleproject.org/highlight/clacc-an-open-source-openacc-compiler-and-source-code-translation-project/). Note that Clacc is publicly available [here](https://github.com/llvm-doe-org/llvm-project/wiki).
 
