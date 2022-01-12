@@ -103,7 +103,7 @@ The Eq. (xx) can be solved iteratively by defining some initial conditions that 
 
 # Comparative study: OpenACC versus OpenMP
 
-In the following we cover both the implementation of the OpenACC model to accelerate the Jacobi algorithm and the OpenMP offloading model in the aim of conducting a comparative experiment. The experiments are systematically performed with a fixed number of grid points as well as the number of iterations that ensures the convergence of the algorithm.
+In the following we cover both the implementation of the OpenACC model to accelerate the Jacobi algorithm and the OpenMP offloading model in the aim of conducting a comparative experiment. The experiments are systematically performed with a fixed number of grid points as well as the number of iterations that ensures the convergence of the algorithm...
 
 ## Experiment on OpenACC offloading
 
