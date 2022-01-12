@@ -21,10 +21,11 @@ By the end of this tutorial, the user will be able to:
 *	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
 *	Get some highlights of the OpenACC-to-OpenMP translation using the `Clacc` compiler platform.
 
+
 #### Table of Contents
 
-- [Introduction](#Introduction)
-- [Computational model](#Computational)
+- [Introduction](#introduction)
+- [Computational model](#computational model)
 - [Experiment on OpenACC offloading](#ExperimentACC)
 - [Experiment on OpenMP offloading](#ExperimentOMP)
 - [Mapping OpenACC to OpenMP](#MappingACC2OMP)
@@ -301,7 +302,7 @@ We present a direct comparison between the OpenACC and OpenMP offload features. 
 We thus discuss this conversion procedure in the next section.
  
 ```bash
- <p style="color:blue">**OpenACC**.</p>                        |                    **OpenMP**
+                    **OpenACC**                        |                    **OpenMP**
 !$acc data copyin(f) copyout(f_k)                      |  !$omp target data map(to:f) map(from:f_k)
    do while (max_err.gt.error.and.iter.le.max_iter)    |     do while (max_err.gt.error.and.iter.le.max_iter)
 !$acc parallel loop gang worker vector collapse(2)     |  !$omp target teams distribute parallel do simd collapse(2) 
