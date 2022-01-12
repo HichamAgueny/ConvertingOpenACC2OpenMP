@@ -111,7 +111,7 @@ We begin first by illustarting the functionality of the OpenACC model in terms o
 
 <img src="https://user-images.githubusercontent.com/95568317/149146826-e54d09ef-b428-466e-9f05-1bd2b95c3461.jpg" width="1000" height="300">
 
-***Fig. 1.** GPU-architecture. Left-hand-side: software concept; right-hand-side: hardware aspect.*
+**Fig. 1.** *GPU-architecture. Left-hand-side: software concept; right-hand-side: hardware aspect.*
 
 In the hardware picture, a GPU-device consists of a block of Compute Units (CUs) (CU is a general term for a Streaming Multiprocessor, SM) each of which is organized as a matrix of Processing Elements (PEs) (PE is a general term for a CUDA core), as shown in Fig. 1 (right-hand side). As an example, the [NVIDIA P100 GPU-accelerators](https://images.nvidia.com/content/tesla/pdf/nvidia-tesla-p100-PCIe-datasheet.pdf) [see also [here](http://web.engr.oregonstate.edu/~mjb/cs575/Handouts/gpu101.2pp.pdf)] have 56 CUs (or 56 SMs) and each CU has 64 PEs (or 64 CUDA cores) with a total of 3584 PEs (i.e. 3584 FP32 cores/GPU or 1792 FP64 cores/GPU), while the [NVIDIA V100](https://images.nvidia.com/content/technologies/volta/pdf/volta-v100-datasheet-update-us-1165301-r5.pdf) has 80 CUs and each CU has 64 PEs with a total of 5120 PEs (5120 FP32/GPU or 2560 FP64/GPU), where FP32 and FP64 correspond to the single-precision Floating Point (FP) (i.e. 32 bit) and double precision (64 bit), respectively. 
 
@@ -185,7 +185,7 @@ Once can also introduce explicit control of the parallelism. This can be achieve
 
 ![Fig2](https://user-images.githubusercontent.com/95568317/148846246-39e4610e-1878-4812-8850-551b12c5e0b4.jpeg)
 
-***Fig. 2.** Performance of different OpenACC directives.*
+**Fig. 2.** *Performance of different OpenACC directives.*
 
 
 ### Compiling and running OpenACC-program
@@ -274,7 +274,7 @@ As in the previous section, we begin by briefly describing the AMD architecture.
 
 ![Fig3](https://user-images.githubusercontent.com/95568317/148846520-6b1f8540-abf1-4953-9677-f72c347cc5cc.jpg)
 
-***Fig. 3.** Performance of different OpenMP directives.*
+**Fig. 3.** *Performance of different OpenMP directives.*
 
 
 ### Compiling and running OpenMP-program
@@ -356,7 +356,7 @@ No counterpart  | omp schedule(,)  | to schedule the work for each thread accord
 private(var)         | private(var)          | to allocate a copy of the variable `var` on each gang/teams|
 firstprivate    | firstprivate     | to allocate a copy of the variable `var` on each gang/teams and to initialise it with the value of the local thread| 
 
-***Table 1.** Description of various directives and clauses: OpenACC vs OpenMP.*
+**Table 1.** *Description of various directives and clauses: OpenACC vs OpenMP.*
  
 Details about OpenACC and OpenMP library routines can be found, respectively, [here] and [here].
 
