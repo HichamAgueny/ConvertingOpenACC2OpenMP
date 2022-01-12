@@ -76,7 +76,7 @@ The Eq.(2) can be further simplified and takes the final form
 $$f(x_i,y_j)=\frac{f(x_{i+1},y) + f(x_{i-1},y) + f(x,y_{i+1}) + f(x,y_{i-1})}{4}$$.   (3)
 ```
 
-The Eq. (3) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid having 8192 points in both `x` and `y` directions. The compute code is written in *Fortran 90* and a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc). The serial code can be written as
+The Eq. (3) can be solved iteratively by defining some initial conditions that reflect the geometry of the problem at-hand. The iteration process can be done  either using ...or Jacobi algorithm. In this tutorial, we apt for the Jacobi algorithm due to its simplicity. The laplace equation is solved in a 2D-grid, and the corresponding compute code, which is written in *Fortran 90*, is given below in a serial form. Note that a *C*-based code can be found [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc).
 
 ```bash
        do while (max_err.gt.error.and.iter.le.max_iter)
@@ -103,7 +103,7 @@ The Eq. (3) can be solved iteratively by defining some initial conditions that r
 
 # Comparative study: OpenACC versus OpenMP
 
-In the following we cover both the implementation of the OpenACC model to accelerate the Jacobi algorithm and the OpenMP offloading model in the aim of conducting a comparative experiment. The experiments are systematically performed with a fixed number of grid points as well as the number of iterations that ensures the convergence of the algorithm...
+In the following we cover both the OpenACC and OpenMP implementations to accelerate the Jacobi algorithm in the aim of conducting a comparative experiment between the two programming models. The experiments are systematically performed with a fixed number of grid points (i.e. 8192 points in both `x` and `y` directions) as well as the number of iterations that ensures the convergence of the algorithm, which is found to be 240 iterations resulting in an error of 0.001.
 
 ## Experiment on OpenACC offloading
 
