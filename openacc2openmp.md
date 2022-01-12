@@ -223,23 +223,21 @@ In the script above, the option `partition--accell` enables the access to the GP
 
 ## Experiment on OpenMP offloading
 
-In this section, we carry out an experiment on [OpenMP](https://www.openmp.org/wp-content/uploads/OpenMP-API-Specification-5-1.pdf) offloading by adopting the same scenario as in the previous section but with the use of a different GPU-architecture: AMD Mi100 accelerator. The functionality of OpenMP is somewhat similar to the one of OpenACC as schematically presented above. In the OpenMP concept, a block of loops is offloaded to a device via the construct **target**. A set of threads is then created on each compute unit (CU) by means of the directive **teams** to execute the offloaded region. Here, the offloaded region (i.e. block of loops) gets assigned to teams via the clause **distribute**, and get executed on the processing elements by means of the directive **parallel do simd**.  
+In this section, we carry out an experiment on [OpenMP](https://www.openmp.org/wp-content/uploads/OpenMP-API-Specification-5-1.pdf) offloading by adopting the same scenario as in the previous [section](#experiment-on-openacc-offloading) but with the use of a different GPU-architecture: AMD Mi100 accelerator. The functionality of OpenMP is similar to the one of OpenACC, although the terminology is different [cf. Fig. 1](#Fig1). In the OpenMP concept, a block of loops is offloaded to a device via the construct **target**. A set of threads is then created on each compute unit (CU) ([cf. Fig. 1.](#Fig1) right-hand-side) by means of the directive **teams** to execute the offloaded region. Here, the offloaded region (i.e. block of loops) gets assigned to teams via the clause **distribute**, and get executed on the processing elements by means of the directive **parallel do simd**.  
 
-These compute constructs define the parallelism concept in OpenMP as show in the application below. This implementation of the OpenMP application is presented for two cases: (i) OpenMP without introducing the data directive and (ii) OpenMP with the data directive. This Comparison allows us to identify the role of data management during the data-transfer between the host and a device, which in turn permits to get some insights into the performance of the OpenMP features. This performance is summarised in Fig.. The figure shows how the performance gets improved when introducing the data directive in the begining of the iteration. This indeed, allows to keep the data in the device during the iteration process and copy the data back only at the end of the iteration. By doing so, the performance is improved by almost a factor of 20: it goes from .. in the absence of the data directive to 2.1 s their presence. 
+These directives define the concept of parallelism in OpenMP. The concept is implemented using the same model described in [Section II](#computational model).   The implementation is presented below for two cases: (i) OpenMP without introducing the data directive and (ii) OpenMP with the data directive. This Comparison allows us to identify the benefit of data management during the data-transfer between the host and a device. This in turn permits to get some insights into the performance of the OpenMP features. 
 
+In the left-hand-side of the application, the arrays **f** and **f_k**, which define the compute region, are copied from the host to a device and back, respectively via the directive ****. The data det  is copied to 
 
-The performance is presented in Fig. 
+The performance of our OpenMP experiment is depicted in [Fig. 3](#Fig3). The figure shows how the performance gets improved when introducing the data directive in the begining of the iteration. This implementation has the advantage of keeping the data in the device during the iteration process and copy them back to the host only at the end of the iteration. By doing so, the performance is improved by almost a factor of 20: it goes from .. in the absence of the data directive to 2.1 s their presence. As in OpenACC application, the performance can be further tuned by introducing additional clauses, specifically, the clause **collapse**, which here permits to reduce the computing time from to ...
+
+The description of the compute constructs and clauses implemented in our application is provided in the [Table. 1](Table1) together with those of OpenACC.
+
+An additonal application of OpenMP offloading implemented in C can be found [here](https://documentation.sigma2.no/code_development/guides/ompoffload.html).
 
 copy arrays from the host to the device and back to the host at the end of the loop. This process will repeat itself at each iteration
 
-The description of the constructs and clauses implemented in our application is provided in the table below.
-
-An additonal application on OpenMP offloading can be found [here](https://documentation.sigma2.no/code_development/guides/ompoffload.html)
-
-As in the previous section, we begin by briefly describing the AMD architecture. This is schematically illustrated in [Fig. 1](#Fig1). Here one can see that each block 
-
-..... 
-
+         
 ```bash
           **OpenMP without data directive**            |                 **OpenMP with data directive**
                                                        |  !$omp target data map(to:f) map(from:f_k)
