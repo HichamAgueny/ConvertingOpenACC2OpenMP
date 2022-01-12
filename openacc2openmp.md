@@ -24,12 +24,11 @@ By the end of this tutorial, the user will be able to:
 #### Table of Contents
 
 - [Introduction](#Introduction)
-- [Model xx](#Model xx)
-- [Computational model](#Computational model)
-- [Experiment on OpenACC offloading](#Experiment on OpenACC offloading)
-- [Experiment on OpenMP offloading](#Experiment on OpenMP offloading)
-- [Mapping OpenACC to OpenMP](#Mapping OpenACC to OpenMP)
-- [Discussion on porting OpenACC to OpenMP](#Discussion on porting OpenACC to OpenMP)
+- [Computational model](#Computational)
+- [Experiment on OpenACC offloading](#ExperimentACC)
+- [Experiment on OpenMP offloading](#ExperimentOMP)
+- [Mapping OpenACC to OpenMP](#MappingACC2OMP)
+- [Discussion on porting OpenACC to OpenMP](#DiscussionACC2OMP)
 
 
 # Introduction
@@ -57,7 +56,6 @@ suffers from some weaknesses, such as low performance, issues with the diagnosti
  This tutorial is organised as follows. In sec. II, we provide a computational model, which is based on solving the Laplace equation. Section III is devoted to 
  the analysis of experiments performed using the OpenACC and OpenMP offload features. Section IV is directed to a discussion about converting OpenACC to OpenMP in the Clang/Flang compiler. In Sec. V we provide a short description on the compilation process. Finally, conclusions are given in Sec. VI.
  
-# Model xx
 
 # Computational model
 
