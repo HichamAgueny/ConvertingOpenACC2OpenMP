@@ -5,9 +5,8 @@
 
 This tutorial is designed for beginners in GPU-programming and who want to get familiar 
 with available directives programming models, in particular, OpenACC and OpenMP offloading
-models. The tutorial does not require any basic knowledge in GPU-programming. It aims at
-providing an overview of these two models, and at guiding users towards their optimal
-use. This tutorial ultimately aims at initiating user interest in GPU-programming. 
+models. It aims at providing an overview of these two models, and guiding users towards their optimal
+use. This tutorial ultimately aims at initiating user's interest in GPU-programming. 
 Specifically, it will familiarise the users with the most needed
 constructs and clauses via a practical tool based on solving numerically the Laplace
 equation, and carrying out experiments on their performance.
@@ -15,11 +14,10 @@ equation, and carrying out experiments on their performance.
 By the end of this tutorial, the user will be able to: 
 
 *	Recognise the necessity of GPU-programming.
-*	Recognise the GPU-architecture and its functionality.
+*	Acquire some basic knowledge of the GPU-architecture and the functionality of the underlying models.
 *	Use appropriate constructs and clauses on either programming model to offload compute regions to the GPU device.
-*	Select and map regions of a code into a target device.
 *	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
-*	Get some highlights of the OpenACC-to-OpenMP translation using the `Clacc` compiler platform.
+*	Get some highlights of the OpenACC-to-OpenMP translation using the `Clacc/Flacc` compiler platform.
 
 
 #### Table of Contents
