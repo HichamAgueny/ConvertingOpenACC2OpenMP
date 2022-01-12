@@ -227,16 +227,11 @@ In this section, we carry out an experiment on [OpenMP](https://www.openmp.org/w
 
 These directives define the concept of parallelism in OpenMP. The concept is implemented using the same model described in [Section II](#computational model).   The implementation is presented below for two cases: (i) OpenMP without introducing the data directive and (ii) OpenMP with the data directive. This Comparison allows us to identify the benefit of data management during the data-transfer between the host and a device. This in turn provides insights into the performance of the OpenMP features. 
 
-In the left-hand-side of the OpenMP application, the arrays **f** and **f_k**, which define the main components of the compute region, are copied from the host to a device and back, respectively via the clause **map**. Once the data are offloaded to a device, the parallelism gets executed according to the scenario described above. This scheme repeats itself at each iteration, resulting in a low performance as shown in [Fig. 3](#Fig3). 
+In the left-hand-side of the OpenMP application, the arrays **f** and **f_k**, which define the main components of the compute region, are copied from the host to a device and back, respectively via the clause **map**. Once the data are offloaded to a device, the parallelism gets executed according to the scenario described above. This scheme repeats itself at each iteration, which causes a low performance as shown in [Fig. 3](#Fig3). Here the computing time is 119.6 s, which too high compared to 76.52 s in the serial case. A similar behavior is observed in the OpenACC application.
 
-The performance of our OpenMP experiment is depicted in [Fig. 3](#Fig3). The figure shows how the performance gets improved when introducing the data directive in the begining of the iteration. This implementation has the advantage of keeping the data in the device during the iteration process and copy them back to the host only at the end of the iteration. By doing so, the performance is improved by almost a factor of 20: it goes from .. in the absence of the data directive to 2.1 s their presence. As in OpenACC application, the performance can be further tuned by introducing additional clauses, specifically, the clauses **collapse** and **schedule** which here permit to reduce the computing time from to ...
+The OpenMP performance however gets improved when introducing the directive **data** in the begining of the iteration. This implementation has the advantage of keeping the data in the device during the iteration process and copying them back to the host only at the end of the iteration. By doing so, the performance is improved by almost a factor of 22, as depicted in [Fig. 3](#Fig3): it goes from 119.6 s in the absence of the data directive to 5.4 s when the directive is introduced. As in OpenACC application, the performance can be further tuned by introducing additional clauses, specifically, the clauses **collapse** and **schedule** which here permit to reduce the computing time from 5.4 s to 2.15 s. 
 
-The description of the compute constructs and clauses implemented in our application is provided in the [Table. 1](Table1) together with those of OpenACC.
-
-An additonal application of OpenMP offloading implemented in C can be found [here](https://documentation.sigma2.no/code_development/guides/ompoffload.html).
-
-copy arrays from the host to the device and back to the host at the end of the loop. 
-
+The description of the compute constructs and clauses used in our OpenMP application is provided in the [Table. 1](Table1) together with those of OpenACC. For further OpenMP tutorials, we refer to a different scenario implemented in C, which can be found [here](https://documentation.sigma2.no/code_development/guides/ompoffload.html).
          
 ```bash
           **OpenMP without data directive**            |                 **OpenMP with data directive**
