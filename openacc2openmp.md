@@ -196,9 +196,9 @@ $ nvfortran -fast -acc -Minfo=accel -o laplace_acc.exe laplace_acc.f90
 or
 $ nvfortran ta=tesla:cc60 -Minfo=accel -o laplace_acc.exe laplace_acc.f90
 ```
-where the flags `-acc` and `-⁠ta=[target]` enables OpenACC directives. The option `[target]` reflects the name of the GPU device. The latter is set at [tesla:cc60] for the device name Tesla P100 and [tesla:cc70] for the device tesla V100. This information can be viewed by running the command `pgaccelinfo`. Last, the flag option `-Minfo` enables the compiler to print out the feedback messages on optimizations and transformations.
+where the flags *-acc* and *-⁠ta=[target]* enables OpenACC directives. The option *[target]* reflects the name of the GPU device. The latter is set to be *[tesla:cc60]* for the device name Tesla P100 and *[tesla:cc70]* for the tesla V100 device. This information can be viewed by running the command `pgaccelinfo`. Last, the flag option *-Minfo* enables the compiler to print out the feedback messages on optimizations and transformations.
 
-The generated binary (i.e. `laplace_acc.exe`) can be lauched with the use of a Slurm script
+The generated binary (i.e. `laplace_acc.exe`) can be lauched with the use of a Slurm script as follows
 ```bash
 #!/bin/bash
 #SBATCH --account=nn1234k 
@@ -215,7 +215,7 @@ module load NVHPC/21.2
  
 $ srun ./laplace_acc.exe
 ```
-In the script above, the option `partition--accell` enables the access to the GPU, as already shown [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc). One can also use the command `sinfo` to get information about which nodes are connected to the GPUs. 
+In the script above, the option *partition--accell* enables the access to the GPU, as shown [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc). One can also use the command `sinfo` to get information about which nodes are connected to the GPUs. 
 
 > :memo: **Note:** The compilation process requires loading a NVHPC module, e.g. `module load NVHPC/21.2` or a different version.
 
@@ -277,7 +277,7 @@ Our OpenMP benchmark test runs on AMD Mi100 accelerator. The syntax of the compi
 flang -fopenmp=libomp -fopenmp-targets=<target> -Xopenmp-target=<target> -march=<arch> laplace_omp.f90
 ```
 
-The flag -fopenmp activates the OpenMP directives (i.e. !$omp [construct] in Fortran). The option -fopenmp-targets=<target> is used to enable the target offloading to GPU-accelerators and tells the Flang compiler to use <target>=amdgcn-amd-amdhsa as the AMD target. The -Xopenmp-target flag enables options to be passed to the target offloading toolchain. In addition, we need to specify the architecture of the GPU to be used. This is done via the flag -march=<arch>, where <arch> specifies the name of the GPU-architecture. This characteristic feature can be extracted from the machine via the command `rocminfo` for the AMD device. These commands provide a general view of the GPU-accelerator and additional related information. For instance, the AMD Mi100 accelerator architecture is specified by the flag -march=gfx908 amd-arch.   
+The flag *-fopenmp* activates the OpenMP directives (i.e. !$omp [construct] in Fortran). The option *-fopenmp-targets=<target>* is used to enable the target offloading to GPU-accelerators and tells the Flang compiler to use *<target>=amdgcn-amd-amdhsa* as the AMD target. The *-Xopenmp-target* flag enables options to be passed to the target offloading toolchain. In addition, we need to specify the architecture of the GPU to be used. This is done via the flag *-march=<arch>*, where *<arch>* specifies the name of the GPU-architecture. This characteristic feature can be extracted from the machine via the command `rocminfo` for the AMD device. These commands provide a general view of the GPU-accelerator and additional related information. For instance, the AMD Mi100 accelerator architecture is specified by the flag *-march=gfx908 amd-arch*.   
 
 > :memo: **Note:** The compilation process requires loading a AOMP module, e.g. `AOMP/13.0-2-GCCcore-10.2.0` or a newer version.
 
