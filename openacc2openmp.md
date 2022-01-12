@@ -289,7 +289,7 @@ flang -fopenmp=libomp -fopenmp-targets=<target> -Xopenmp-target=<target> -march=
 
 The flag -fopenmp activates the OpenMP directives (i.e. !$omp [construct] in Fortran). The option -fopenmp-targets=<target> is used to enable the target offloading to GPU-accelerators and tells the Flang compiler to use <target>=amdgcn-amd-amdhsa as the AMD target. The -Xopenmp-target flag enables options to be passed to the target offloading toolchain. In addition, we need to specify the architecture of the GPU to be used. This is done via the flag -march=<arch>, where <arch> specifies the name of the GPU-architecture. This characteristic feature can be extracted from the machine via the command `rocminfo` for the AMD device. These commands provide a general view of the GPU-accelerator and additional related information. For instance, the AMD Mi100 accelerator architecture is specified by the flag -march=gfx908 amd-arch.   
 
-Note that the compilation process requires loading the module `AOMP/13.0-2-GCCcore-10.2.0` or a newer version.
+> :memo: **Note:** The compilation process requires loading a module of AOMP, i.e. `AOMP/13.0-2-GCCcore-10.2.0` or a newer version.
 
  
 ## Mapping OpenACC to OpenMP
@@ -299,11 +299,9 @@ We compare our OpenACC application agains the OpenMP one. This is summarised bel
 We present a direct comparison between the OpenACC and OpenMP offload features. This comparison is shown below and further illustrated in the table, in which we emphasise the meaning of some of the basic constructs and clauses underlying our application. Here, evaluating the behavior of OpenACC and OpenMP by one-to-one mapping is a key feature of the convertion procedure. A closer look at OpenACC and OpenMP codes reveals some similarities and differences in terms of constructs and clauses as summerised in the table. In particular, it shows that the syntax of both programming models is so similar, thus making the implemention of the translation procedure at the syntactic level straightforward. Therefore, such a Comparison is critical for determining the correct mappings to OpenMP.
 
 We thus discuss this conversion procedure in the next section.
-
-todo: use different colors
  
 ```bash
-                    **OpenACC**                        |                    **OpenMP**
+ <p style="color:blue">**OpenACC**.</p>                        |                    **OpenMP**
 !$acc data copyin(f) copyout(f_k)                      |  !$omp target data map(to:f) map(from:f_k)
    do while (max_err.gt.error.and.iter.le.max_iter)    |     do while (max_err.gt.error.and.iter.le.max_iter)
 !$acc parallel loop gang worker vector collapse(2)     |  !$omp target teams distribute parallel do simd collapse(2) 
@@ -360,7 +358,8 @@ No counterpart  | omp schedule(,)  | to schedule the work for each thread accord
 private(var)         | private(var)          | to allocate a copy of the variable `var` on each gang/teams|
 firstprivate    | firstprivate     | to allocate a copy of the variable `var` on each gang/teams and to initialise it with the value of the local thread| 
 
-
+***Table 1.** Description of various directives and clauses: OpenACC vs OpenMP.*
+ 
 Details about OpenACC and OpenMP library routines can be found, respectively, [here] and [here].
 
 For completness, we provide 
