@@ -21,6 +21,16 @@ By the end of this tutorial, the user will be able to:
 *	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
 *	Get some highlights of the OpenACC-to-OpenMP translation using the `Clacc` compiler platform.
 
+#### Table of Contents
+
+- [Introduction](#Introduction)
+- [Computational model](#Computational model)
+- [Experiment on OpenACC offloading](#Experiment on OpenACC offloading)
+- [Experiment on OpenMP offloading](#Experiment on OpenMP offloading)
+- [Mapping OpenACC to OpenMP](#Mapping OpenACC to OpenMP)
+- [Discussion on porting OpenACC to OpenMP](#Discussion on porting OpenACC to OpenMP)
+
+
 # Introduction
 
 OpenACC and OpenMP are the most widely used programming models for heterogeneous computing on moderm HPC architectures. OpenACC was developed a decade ago and was designed for parallel programming of heterogenous CPU & GPU systems. Whereas OpenMP is historically known to be directed to shared-memory multi-core programming, and only recently has provided support for heterogenous systems. OpenACC and OpenMP are directive-based programming models for offloading compute regions 
@@ -46,14 +56,7 @@ suffers from some weaknesses, such as low performance, issues with the diagnosti
  This tutorial is organised as follows. In sec. II, we provide a computational model, which is based on solving the Laplace equation. Section III is devoted to 
  the analysis of experiments performed using the OpenACC and OpenMP offload features. Section IV is directed to a discussion about converting OpenACC to OpenMP in the Clang/Flang compiler. In Sec. V we provide a short description on the compilation process. Finally, conclusions are given in Sec. VI.
  
- #### Table of Contents
-
-- [Computational model](#Computational model)
-- [Experiment on OpenACC offloading](#Experiment on OpenACC offloading)
-- [Experiment on OpenMP offloading](#Experiment on OpenMP offloading)
-- [Mapping OpenACC to OpenMP](#Mapping OpenACC to OpenMP)
-- [Discussion on porting OpenACC to OpenMP](#Discussion on porting OpenACC to OpenMP)
-
+ 
 # Computational model
 
 We give a brief description of the numerical model used to slove the Laplace equation &Delta;f=0. For the sake of simplicity, we solve the eqution in a two-dimentional (2D) uniform grid according to
@@ -108,7 +111,7 @@ We begin first by illustarting the functionality of the OpenACC model in terms o
 
 <img src="https://user-images.githubusercontent.com/95568317/149146826-e54d09ef-b428-466e-9f05-1bd2b95c3461.jpg" width="1000" height="300">
 
-***Fig.1** GPU-architecture. Left-hand-side: software concept; right-hand-side: hardware aspect.*
+***Fig. 1.** GPU-architecture. Left-hand-side: software concept; right-hand-side: hardware aspect.*
 
 In the hardware picture, a GPU-device consists of a block of Compute Units (CUs) (CU is a general term for a Streaming Multiprocessor, SM) each of which is organized as a matrix of Processing Elements (PEs) (PE is a general term for a CUDA core), as shown in Fig. 1 (right-hand side). As an example, the [NVIDIA P100 GPU-accelerators](https://images.nvidia.com/content/tesla/pdf/nvidia-tesla-p100-PCIe-datasheet.pdf) [see also [here](http://web.engr.oregonstate.edu/~mjb/cs575/Handouts/gpu101.2pp.pdf)] have 56 CUs (or 56 SMs) and each CU has 64 PEs (or 64 CUDA cores) with a total of 3584 PEs (i.e. 3584 FP32 cores/GPU or 1792 FP64 cores/GPU), while the [NVIDIA V100](https://images.nvidia.com/content/technologies/volta/pdf/volta-v100-datasheet-update-us-1165301-r5.pdf) has 80 CUs and each CU has 64 PEs with a total of 5120 PEs (5120 FP32/GPU or 2560 FP64/GPU), where FP32 and FP64 correspond to the single-precision Floating Point (FP) (i.e. 32 bit) and double precision (64 bit), respectively. 
 
