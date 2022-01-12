@@ -24,7 +24,7 @@ By the end of this tutorial, the user will be able to:
 #### Table of Contents
 
 - [Introduction](#Introduction)
-- [Model xx](#Model)
+- [Model xx](#Model xx)
 - [Computational model](#Computational model)
 - [Experiment on OpenACC offloading](#Experiment on OpenACC offloading)
 - [Experiment on OpenMP offloading](#Experiment on OpenMP offloading)
