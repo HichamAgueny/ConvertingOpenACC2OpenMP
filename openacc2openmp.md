@@ -350,11 +350,8 @@ firstprivate    | firstprivate     | to allocate a copy of the variable `var` on
 
 **Table 1.** *Description of various directives and clauses: OpenACC vs OpenMP.*
  
-Details about OpenACC and OpenMP library routines can be found, respectively, [here] and [here].
+Details about OpenACC and OpenMP library routines can be found, respectively, [here](https://gcc.gnu.org/onlinedocs/libgomp/OpenACC-Runtime-Library-Routines.html) and [here](https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html).
 
-For completness, we provide 
-
-Fig. depicts ....
 
 # Discussion on porting OpenACC to OpenMP
 
