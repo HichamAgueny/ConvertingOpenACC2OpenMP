@@ -134,8 +134,17 @@ We move now to discuss our OpenACC experiment, in which we evaluate the performa
 
 To overcome this issue, one need to copy the data to the device only in the begining of the iteration and copy it back to the host at the end of the iteration, once the result converges. This can be done by introducing the data locality concepts via the directives **data**, **copyin** and **copyout**, as shown in the code application (right-hand side). Here, the clause **copyin** transfers the data to the GPU-device, while the clause **copyout** copies the data back to the host. Implementing this approach shows a vast improvement of the performance: the computing time gets reduced by almost a factor of 53: it decreases from 111.2 s to 2.12 s. One can further tun the process by adding additional control, for instance, by introducing the **collapse** clause. Collapsing two or more loops into a single loop is beneficial for the compiler, as it allows to enhance the parallelism when mapping the looped region into the device. In addition, one can specify the clause **reduction**, which allows to compute the maximum of two elements in a parallel way. These additional clauses affect slightly the computing time: it goes from 2.12 s to 1.95 s.
 
+For completeness, we compare in [Fig. 2](#Fig2) the performance of the compute constructs **kernels** and **parallel loop**. These directives tell the compiler to transfer the control of a compute region to the GPU-device and excute it in a sequence of operations. Although these two constructs have a similar role, they differ in terms of mapping the parallelism into the device. Here, when specifying the **kernels** construct, the compiler perofmes the partition of the parallelism explicitly by choosing the optimal numbers of gangs, workers and the length of the vectors and also some additional clauses. Whereas, the use of the **parallel loop** construct offers some additional functionality: it allows the programmer to control the execution in the device by specifying additional clauses. At the end, the performance remains roughly the same as shown in [Fig. 2](#Fig2): the computing time is 1.97 s for the **kernels** directive and 1.95 s for the **parallel loop** directive. 
 
-Once can also introduce explicit control of the parallelism. This can be achieved by incorporating the clauses: `gang`, `worker` and `vector`. 
+the **gang**, **worker** and **vector**. This specification is optional, and thus it does not affect the functionality of the OpenACC code, except if the number associated to these clauses is specified. 
+
+One can specify the number of **gang**, **worker** and the length of the **vector** clause to parallelise a block of loops. Accoriding to the OpenACC [specification](https://www.openacc.org/sites/default/files/inline-files/OpenACC_Programming_Guide_0_0.pdf) the order of these clauses should be enforced: the **gang** clause must determine the outermost loop and the **vector** clause should define the innermost parallel loop, while the **worker** clause should be in between these two clauses.
+
+
+When using these constructs, the compiler will generate arrays that will be copied back and forth between the host and the device if they are not already present in the device. 
+
+To be specific, the construct **parallel** indicates that the compiler will generate a number of parallel gangs to execute the looped region redundantly.
+The clause **loop** tells the compiler to perform the parallelism for the specified looped region. These two directives can be combined in one directive.
 
 
 ```bash
