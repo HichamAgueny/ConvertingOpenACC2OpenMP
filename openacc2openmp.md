@@ -190,11 +190,7 @@ Once can also introduce explicit control of the parallelism. This can be achieve
 
 ### Compiling and running OpenACC-program
 
-We run our OpenACC-program on the `NVIDIA-GPU P100`. Compiling the code requires first loading the NVHPC module. This can be done on the [saga](https://documentation.sigma2.no/hpc_machines/saga.html) platform via
-```bash
-$ module load NVHPC/21.2
-```
-The syntax of the compilation process is
+We run our OpenACC-program on the `NVIDIA-GPU P100`. The syntax of the compilation process is
 ```bash
 $ nvfortran -fast -acc -Minfo=accel -o laplace_acc.exe laplace_acc.f90
 or
@@ -220,6 +216,9 @@ module load NVHPC/21.2
 $ srun ./laplace_acc.exe
 ```
 In the script above, the option `partition--accell` enables the access to the GPU, as already shown [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc). One can also use the command `sinfo` to get information about which nodes are connected to the GPUs. 
+
+> :memo: **Note:** The compilation process requires loading a NVHPC module, e.g. `module load NVHPC/21.2` or a different version.
+
 
 ## Experiment on OpenMP offloading
 
@@ -280,7 +279,7 @@ flang -fopenmp=libomp -fopenmp-targets=<target> -Xopenmp-target=<target> -march=
 
 The flag -fopenmp activates the OpenMP directives (i.e. !$omp [construct] in Fortran). The option -fopenmp-targets=<target> is used to enable the target offloading to GPU-accelerators and tells the Flang compiler to use <target>=amdgcn-amd-amdhsa as the AMD target. The -Xopenmp-target flag enables options to be passed to the target offloading toolchain. In addition, we need to specify the architecture of the GPU to be used. This is done via the flag -march=<arch>, where <arch> specifies the name of the GPU-architecture. This characteristic feature can be extracted from the machine via the command `rocminfo` for the AMD device. These commands provide a general view of the GPU-accelerator and additional related information. For instance, the AMD Mi100 accelerator architecture is specified by the flag -march=gfx908 amd-arch.   
 
-> :memo: **Note:** The compilation process requires loading a module of AOMP, i.e. `AOMP/13.0-2-GCCcore-10.2.0` or a newer version.
+> :memo: **Note:** The compilation process requires loading a AOMP module, e.g. `AOMP/13.0-2-GCCcore-10.2.0` or a newer version.
 
  
 ## Mapping OpenACC to OpenMP
