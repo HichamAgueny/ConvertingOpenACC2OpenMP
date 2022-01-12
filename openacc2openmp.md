@@ -110,7 +110,7 @@ In the following we cover both the implementation of the OpenACC model to accele
 
 We begin first by illustarting the functionality of the OpenACC model in terms of parallelism, which is implemented via the directives **kernels** or **parallel loop**. The concept of parallelism functions via the generic directives: **gang**, **worker** and **vector** as schematically represented in [Fig. 1](#Fig1) (left-hand side). Here, the compiler initiates the parallelism by generating parallel gangs, in which each gang consists of a set of workers represented by a matrix of threads. This group of threads within a gang execute the same instruction (SIMT, Single Instruction Multiple Threads) via the vectorization process. In this scenario, a block of loops is assigned to each gang, which gets vectorized and executed redundantly by a group of threads.  
 
-![Fig1]<img src="https://user-images.githubusercontent.com/95568317/149146826-e54d09ef-b428-466e-9f05-1bd2b95c3461.jpg" width="1000" height="300">
+<img src="https://user-images.githubusercontent.com/95568317/149146826-e54d09ef-b428-466e-9f05-1bd2b95c3461.jpg" width="1000" height="300">
 
 ***Fig. 1.** GPU-architecture. Left-hand-side: software concept; right-hand-side: hardware aspect.*
 
@@ -153,7 +153,6 @@ In the scenario shown in Fig. 3 (left-hand side), only the directive **parallel 
 
 Once can also introduce explicit control of the parallelism. This can be achieved by incorporating the clauses: `gang`, `worker` and `vector`. 
 
-`todo: how to add colors in the bash code`
 
 ```bash
           **OpenACC without data locality**            |              **OpenACC with data locality**
