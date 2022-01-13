@@ -3,20 +3,13 @@
 
 # Summary
 
-This tutorial is designed for beginners in GPU-programming and who want to get familiar 
-with available directives programming models, in particular, OpenACC and OpenMP offloading
-models. It aims at providing an overview of these two models, and guiding users towards their optimal
-use. This tutorial ultimately aims at initiating user's interest in GPU-programming. 
-Specifically, it will familiarise the users with the most needed
-constructs and clauses via a practical tool based on solving numerically the Laplace
-equation, and carrying out experiments on their performance.
+This documentation is designed for beginners in GPU-programming and who want to get familiar with OpenACC and OpenMP offloading models. Here we provide an overview 
+of these two programming models. Specifically, we provide some insights into the functionality of these models and perform experiments involving different directives and discuss their performance. This is achieved through the use of an application based on solving numerically the Laplace equation. Such experiments reveal the benefit of the use of GPU, which in our case manifests by an increase of the performance by almost a factor of 22. We further carry out a comparative study between the OpenACC and OpenMP models in the aim of converting OpenACC to OpenMP. In this context, we discuss available open-source OpenACC compilers for a conversion procedure. This documentation ultimately aims at initiating developers'/users' interest in GPU-programming. We therefore expect developers/users, by the end of this documentation, to be able to: 
 
-By the end of this tutorial, the user will be able to: 
-
-*	Recognise the necessity of GPU-programming.
+*	Recognise the benefits of GPU-programming.
 *	Acquire some basic knowledge of the GPU-architecture and the functionality of the underlying models.
-*	Use appropriate constructs and clauses on either programming model to offload compute regions to the GPU device.
-*	Identify and assess the differences and similarities between the OpenACC and OpenMP offload features.
+*	Use appropriate constructs and clauses on either programming model to offload compute regions to a GPU device.
+*	Identify and assess differences and similarities between the OpenACC and OpenMP offload features.
 *	Get some highlights of the OpenACC-to-OpenMP translation using the `Clacc/Flacc` compiler platform.
 
 
@@ -33,14 +26,9 @@ By the end of this tutorial, the user will be able to:
 
 # Introduction
 
-OpenACC and OpenMP are the most widely used programming models for heterogeneous computing on moderm HPC architectures. OpenACC was developed a decade ago and was designed for parallel programming of heterogenous CPU & GPU systems. Whereas OpenMP is historically known to be directed to shared-memory multi-core programming, and only recently has provided support for heterogenous systems. OpenACC and OpenMP are directive-based programming models for offloading compute regions 
-from CPU host to GPU devices. These models are referred to as Application Programming 
-Interfaces (APIs), which here enable to communicate between two heterogenous systems 
-(i.e. CPU host and GPU device in our case) and specifically enable offloading to target
- devices. The offloading process is controlled by a set of compiler directives, library 
- runtime routines as well as environment variables. These three components will be 
- addressed in the following for both models. Furthermore, differences and similarities 
- will be assessed in the aim of converting OpenACC to OpenMP.
+OpenACC and OpenMP are the most widely used programming models for heterogeneous computing on moderm HPC architectures. OpenACC was developed a decade ago and was designed for parallel programming of heterogenous systems (i.e. CPU host and GPU device in our case). Whereas OpenMP is historically known to be directed to shared-memory multi-core programming, and only recently has provided support for heterogenous systems. OpenACC and OpenMP are directive-based programming models for offloading compute regions from CPU host to GPU devices. These models are referred to as Application Programming 
+Interfaces (APIs), which here enable to communicate between two heterogenous systems  and specifically enable offloading to target devices. The offloading process is controlled by a set of compiler directives, library runtime routines as well as environment variables. These three components will be 
+ addressed in the following for both models. Furthermore, differences and similarities will be assessed in the aim of converting OpenACC to OpenMP.
 
 *Motivation:* NVIDIA-based Programming models are bounded by some barriers related to the GPU-architecture. 
 Specifically, the models do not enable support on different devices such as AMD and [Intel](https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html) accelerators nor by 
@@ -326,7 +314,7 @@ firstprivate    | firstprivate     | to allocate a copy of the variable `var` on
 
 **Table 1.** *Description of various directives and clauses: OpenACC vs OpenMP.*
  
-Details about OpenACC and OpenMP library routines can be found, respectively, [here](https://gcc.gnu.org/onlinedocs/libgomp/OpenACC-Runtime-Library-Routines.html) and [here](https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html).
+Details about library routines can be found [here](https://gcc.gnu.org/onlinedocs/libgomp/OpenACC-Runtime-Library-Routines.html) for OpenACC and [here](https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html) for OpenMP.
 
 # Discussion on porting OpenACC to OpenMP
 
