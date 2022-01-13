@@ -306,7 +306,7 @@ acc data     | omp target data | to share data between multiple parallel regions
 -- | -- | -- |
 acc loop | omp teams distribute | to workshare for parallelism on a device|
 acc loop gang | omp teams(num_teams) | to partition a loop accross gangs/teams|
-acc loop worker | omp parallel simd | - - |
+acc loop worker | omp parallel simd | to partition a loop across threads|
 acc loop vector | omp parallel simd | - - |
 num_gangs       | num_teams         | to control how many gangs/teams are created |
 num_workers     | num_threads       | to control how many worker/threads are created in each gang/teams |
@@ -326,11 +326,6 @@ firstprivate    | firstprivate     | to allocate a copy of the variable `var` on
 **Table 1.** *Description of various directives and clauses: OpenACC vs OpenMP.*
  
 Details about OpenACC and OpenMP library routines can be found, respectively, [here](https://gcc.gnu.org/onlinedocs/libgomp/OpenACC-Runtime-Library-Routines.html) and [here](https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html).
-
- - The **gang** clause has a role of partitioning the loop across gangs, and each gang has num_gang. 
-- The **worker** clause enables the partition across workers, and each worker has num_worker.
-- The **vector** clause enables the vectorization of the loop, and ....
-
 
 # Discussion on porting OpenACC to OpenMP
 
