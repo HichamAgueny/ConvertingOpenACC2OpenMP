@@ -193,7 +193,7 @@ $ srun ./laplace_acc.exe
 ```
 In the script above, the option *partition--accell* enables the access to the GPU, as shown [here](https://documentation.sigma2.no/code_development/guides/openacc.html?highlight=openacc). One can also use the command `sinfo` to get information about which nodes are connected to the GPUs. 
 
-> :memo: **Note:** The compilation process requires loading a NVHPC module, e.g. `module load NVHPC/21.2` or a different version.
+> :memo: **Note:** The compilation process requires loading a NVHPC module, e.g. `NVHPC/21.2` or a different version.
 
 
 ## Experiment on OpenMP offloading
