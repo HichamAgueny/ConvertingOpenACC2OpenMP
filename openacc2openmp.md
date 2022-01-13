@@ -129,7 +129,8 @@ Accoriding to the OpenACC [specification](https://www.openacc.org/sites/default/
  
 
 > :memo: **Note:** Different gangs operate independently.
-> When incorporating the constructs **kernels** or **parallel loop**, the compiler will generate arrays that will be copied back and forth between the host and the device if they are not already present in the device. 
+> 
+> :memo: **Note:** When incorporating the constructs **kernels** or **parallel loop**, the compiler will generate arrays that will be copied back and forth between the host and the device if they are not already present in the device. 
 
 
 ```bash
