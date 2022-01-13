@@ -165,7 +165,7 @@ For completeness, we compare in [Fig. 2](#Fig2) the performance of the compute c
 
 ### Compiling and running OpenACC-program
 
-We run our OpenACC-program on the `NVIDIA-GPU P100`. The syntax of the compilation process is
+We run our OpenACC-program on the NVIDIA-GPU P100. The syntax of the compilation process is
 ```bash
 $ nvfortran -fast -acc -Minfo=accel -o laplace_acc.exe laplace_acc.f90
 or
