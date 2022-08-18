@@ -1,10 +1,10 @@
 
-# GPU-programming: Porting OpenACC to OpenMP  
+# GPU-programming: Porting OpenACC to OpenMP: Tutorial  
 
 # Summary
 
-This documentation is designed for beginners in GPU-programming and who want to get familiar with OpenACC and OpenMP offloading models. Here we provide an overview 
-of these two programming models. Specifically, we provide some insights into the functionality of these models and perform experiments involving different directives and discuss their performance. This is achieved through the use of an application based on solving numerically the Laplace equation. Such experiments reveal the benefit of the use of GPU, which in our case manifests by an increase of the performance by almost a factor of 22. We further carry out a comparative study between the OpenACC and OpenMP models in the aim of converting OpenACC to OpenMP. In this context, we discuss available open-source OpenACC compilers for a conversion procedure. This documentation ultimately aims at initiating developers'/users' interest in GPU-programming. We therefore expect developers/users, by the end of this documentation, to be able to: 
+This tutorial is designed for beginners in GPU-programming and who want to get familiar with OpenACC and OpenMP offloading models. Here we provide an overview 
+of these two programming models. Specifically, we provide some insights into the functionality of these models and perform experiments involving different directives and discuss their performance. This is achieved through the use of an application based on solving numerically the Laplace equation. Such experiments reveal the benefit of the use of GPU, which in our case manifests by an increase of the performance by almost a factor of 22. We further carry out a comparative study between the OpenACC and OpenMP models in the aim of converting OpenACC to OpenMP. In this context, we discuss available open-source OpenACC compilers for a conversion procedure. This tutorial ultimately aims at initiating developers'/users' interest in GPU-programming. We therefore expect developers/users, by the end of this tutorial, to be able to: 
 
 *	Recognise the benefits of GPU-programming.
 *	Acquire some basic knowledge of the GPU-architecture and the functionality of the underlying models.
